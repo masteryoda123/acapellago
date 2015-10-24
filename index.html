@@ -55,7 +55,7 @@
 
         //Define variables that might be used in more
         //than one function
-        var state, gameScene, gameOverScene, endMessage, startMessage, startScene, optionMenu, id;
+        var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, menuItemTwo, menuItemThree, startScene, optionMenu, id;
 
         function setup() {
             gameScene = new Container();
@@ -86,13 +86,32 @@
 
             //Create the text sprite and add it to the `gameOver` scene
             startMessage = new Text(
-            "Acapellago: Press any key to continue.",
-            {font: "64px Futura", fill: "white"}
+            "Acapellago",
+            {font: "64px Arial", fill: "white", align: "center"}
             );
-            startMessage.x = 120;
-            startMessage.y = RENDER_HEIGHT / 2 - 32;
+            startMessage.x = RENDER_WIDTH / 2 - startMessage.width / 2;
+            startMessage.y = RENDER_HEIGHT / 8 - startMessage.height / 8;
             startScene.addChild(startMessage);
 
+            var menuItemStyle = {
+                font: '36px  Arial',
+                fill: 'white'
+            }
+
+            menuItemOne = new Text("Play", menuItemStyle);
+            menuItemOne.x = RENDER_WIDTH / 2 - menuItemOne.width / 2;
+            menuItemOne.y = 3 * RENDER_HEIGHT / 8 - menuItemOne.height / 8;
+            startScene.addChild(menuItemOne);
+
+            menuItemTwo = new Text("Tutorial", menuItemStyle);
+            menuItemTwo.x = RENDER_WIDTH / 2 - menuItemTwo.width / 2;
+            menuItemTwo.y = 4 * RENDER_HEIGHT / 8 - menuItemTwo.height / 8;
+            startScene.addChild(menuItemTwo);
+
+            menuItemThree = new Text("Settings", menuItemStyle);
+            menuItemThree.x = RENDER_WIDTH / 2 - menuItemThree.width / 2;
+            menuItemThree.y = 5 * RENDER_HEIGHT / 8 - menuItemThree.height / 8;
+            startScene.addChild(menuItemThree);
 
             //Create the `gameOver` scene
             gameOverScene = new Container();
@@ -109,6 +128,7 @@
             endMessage.x = 120;
             endMessage.y = RENDER_HEIGHT / 2 - 32;
             gameOverScene.addChild(endMessage);
+
 
             //background amimate
             requestAnimationFrame(update);
@@ -133,12 +153,52 @@
             right = keyboard(39),
             down = keyboard(40);
 
+        var curr = 0;
+        var menuItems;
+
         function start() {
-            if (left.isDown || right.isDown || enter.isDown || up.isDown || down.isDown) {
-                state = play;
+            menuItems = [menuItemOne, menuItemTwo, menuItemThree];
+            menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#1D2629'};
+
+            down.press = function() {
+                    if (curr < menuItems.length - 1) {
+                        menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#FFFFFF'};
+                        curr++;
+                        menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#1D2629'};
+                    } else {
+                        menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#FFFFFF'};
+                        curr = 0;
+                        menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#1D2629'};
+                    }
             }
+
+            up.press = function() {
+                if (curr > 0) {
+                    menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#FFFFFF'};
+                    curr--;
+                    menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#1D2629'};
+                } else {
+                    menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#FFFFFF'};
+                    curr = menuItems.length - 1;
+                    menuItems[curr].style = {font: '36px Arial', align: 'center', fill: '#1D2629'};
+                }
+            }
+
+            enter.press = function() {
+                if (menuItems[curr] === menuItemOne) {
+                    state = play;
+                } else if (menuItems[curr] === menuItemTwo) {
+                    state = end;
+                } else {
+
+                }
+            }
+
         }
 
+        /**
+            Main Game Function
+        */
         function play() {
             startScene.visible = false;
             gameScene.visible = true;
@@ -158,6 +218,10 @@
         function end() {
             gameScene.visible = false;
             gameOverScene.visible = true;
+            // add two items: go to main menu & reset
+            if (left.isDown || right.isDown || enter.isDown || up.isDown || down.isDown) {
+                state = play;
+            }
         }
 
         //To change the background color
