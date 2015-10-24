@@ -25,40 +25,11 @@
 
 
         // create a renderer instance
-        // var renderer = PIXI.autoDetectRenderer(1280, 720);
-        //Force canvas rendering like this:
-        // var renderer = new PIXI.CanvasRenderer(600, 400);
-
-        //Force WebGL rendering like this:
-        // var renderer = new PIXI.WebGLRenderer(600, 400);
-
-        // add the renderer view element to the DOM
-        // document.body.appendChild(renderer.view);
-
-        // requestAnimFrame( animate );
-
         // create an new instance of a pixi stage
-        // Texture.baseTexture.height = 780;
-        // Texture.width = 1300;
         var stage = new Container(),
             renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
             document.body.appendChild(renderer.view);
 
-<<<<<<< HEAD
-        //     if (Texture.baseTexture == null) {
-        //       alert("null!");
-        //     }
-
-        // Texture.baseTexture.height = 720;
-        // texture.baseTexture.width = 1280;
-
-        loader
-          .add("images/terrain.json")
-          .load(setup);
-
-        loader
-          .add("images/terrain3.png")
-          .load(setup);
 
         //The `renderer.view` is just an ordinary `<canvas>` element.
         //Here's how you can reference to add an optional dashed
@@ -70,54 +41,7 @@
 
         //Define variables that might be used in more
         //than one function
-        var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, menuItemTwo, menuItemThree, startScene, optionMenu, id, platform1,
-          platform1_info, background;
 
-        function setup() {
-
-            gameScene = new Container();
-            stage.addChild(gameScene);
-
-            // background = new Sprite(resources["images/terrain3.png"].texture);
-
-            // id = resources["images/sheet.json"].textures;
-            id = resources["images/terrain.json"].textures;
-
-
-            //background
-            background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
-            // platform1_info = id["platform1.png"]["frame"];
-            // platform1 = new PIXI.TilingSprite(id["platform1.png"],
-            //                             platform1_info["width"],
-            //                             platform1_info["height"]);
-
-            // platform1.tilePosition.x = platform1_info["x"];
-            // platform1.tilePosition.y = platform1_info["y"];
-            // gameScene.addChild(platform1);
-            background.tilePosition.x = 0;
-            background.tilePosition.y = 0;
-            gameScene.addChild(background);
-
-            gameScene.visible = false;
-
-
-            //Create the 'start' scene
-            startScene = new Container();
-            stage.addChild(startScene);
-
-            //Create the text sprite and add it to the `gameOver` scene
-            startMessage = new Text(
-            "Acapellago",
-            {font: "64px Arial", fill: "white", align: "center"}
-            );
-            startMessage.x = RENDER_WIDTH / 2 - startMessage.width / 2;
-            startMessage.y = RENDER_HEIGHT / 8 - startMessage.height / 8;
-            startScene.addChild(startMessage);
-
-            var menuItemStyle = {
-                font: '36px  Arial',
-                fill: 'white'
-=======
         window.WebFontConfig = {
             google: {
                 families: ['Play', 'Snippet']
@@ -126,7 +50,6 @@
             active: function() {
                 //do something
                 init();
->>>>>>> origin/master
             }
         };
 
@@ -145,11 +68,10 @@
 
         function init()
         {
-            loader
-              .add("images/sheet.json")
-              .load(setup);
-
-
+              loader
+                .add("images/terrain.json")
+                .add("images/terrain3.png")
+                .load(setup);
               //The `renderer.view` is just an ordinary `<canvas>` element.
               //Here's how you can reference to add an optional dashed
               //border around the canvas
@@ -161,43 +83,35 @@
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, startScene,
-                  optionMenu, id;
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, startScene, background, optionMenu, id;
 
               function setup() {
                   gameScene = new Container();
                   stage.addChild(gameScene);
 
-                  id = resources["images/sheet.json"].textures;
+                  id = resources["images/terrain.json"].textures;
 
 
-                  //temp game screen
-                  // tempGameScreen = new PIXI.Sprite(id["gameSceneHolder.png"]);
-                  tempGameScreen = new PIXI.TilingSprite(id["gameSceneHolder.png"],
-                                              RENDER_WIDTH, RENDER_HEIGHT);
-                  tempGameScreen.scale.y = 20;
-                  tempGameScreen.scale.x = 28;
+                  background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+                  // platform1_info = id["platform1.png"]["frame"];
+                  // platform1 = new PIXI.TilingSprite(id["platform1.png"],
+                  //                             platform1_info["width"],
+                  //                             platform1_info["height"]);
 
                   // tempGameScreen.position.x = 0;
                   // tempGameScreen.position.y = 0;
-                  tempGameScreen.tilePosition.x = 0;
-                  tempGameScreen.tilePosition.y = 0;
-                  gameScene.addChild(tempGameScreen);
+                  // platform1.tilePosition.x = platform1_info["x"];
+                  // platform1.tilePosition.y = platform1_info["y"];
+                  // gameScene.addChild(platform1);
+                  background.tilePosition.x = 0;
+                  background.tilePosition.y = 0;
+                  gameScene.addChild(background);
 
                   gameScene.visible = false;
 
-
-<<<<<<< HEAD
-        function update () {
-          background.tilePosition.x -= .5;
-          renderer.render(gameScene);
-          requestAnimationFrame(update);
-        }
-=======
                   //Create the 'start' scene
                   startScene = new Container();
                   stage.addChild(startScene);
->>>>>>> origin/master
 
 
                   // add background
@@ -290,7 +204,7 @@
               }
 
               function update () {
-                tempGameScreen.tilePosition.x -= .2;
+                background.tilePosition.x -= 2;
                 renderer.render(gameScene);
                 requestAnimationFrame(update);
               }
