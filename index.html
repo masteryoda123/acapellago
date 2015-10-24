@@ -1,26 +1,26 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Arcapellago</title>
-	<link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
+    <title>Arcapellago</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
 </head>
 <body>
-	<script src="./pixi.js/bin/pixi.js"></script>
-	<script src="./js/index.js"></script>
-	<!-- <h1>Arcapellago</h1>  -->
+    <script src="./pixi.js/bin/pixi.js"></script>
+    <script src="./js/index.js"></script>
+    <!-- <h1>Arcapellago</h1>  -->
     <script>
-		//Aliases
-		var Container = PIXI.Container,
-			autoDetectRenderer = PIXI.autoDetectRenderer,
-			loader = PIXI.loader,
-			resources = PIXI.loader.resources,
-			TextureCache = PIXI.utils.TextureCache,
-			Texture = PIXI.Texture,
-			Sprite = PIXI.Sprite,
-			Text = PIXI.Text,
-			Graphics = PIXI.Graphics,
-			RENDER_WIDTH = 1280,
-			RENDER_HEIGHT = 720;
+        //Aliases
+        var Container = PIXI.Container,
+            autoDetectRenderer = PIXI.autoDetectRenderer,
+            loader = PIXI.loader,
+            resources = PIXI.loader.resources,
+            TextureCache = PIXI.utils.TextureCache,
+            Texture = PIXI.Texture,
+            Sprite = PIXI.Sprite,
+            Text = PIXI.Text,
+            Graphics = PIXI.Graphics,
+            RENDER_WIDTH = 1280,
+            RENDER_HEIGHT = 720;
 
 
         // create a renderer instance
@@ -38,8 +38,8 @@
 
         // create an new instance of a pixi stage
         var stage = new Container(),
-        	renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
-        	document.body.appendChild(renderer.view);
+            renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
+            document.body.appendChild(renderer.view);
 
         loader
           .add("images/sheet.json")
@@ -53,15 +53,16 @@
         //To resize the canvas
         // renderer.resize(512, 512);
 
-		//Define variables that might be used in more
-		//than one function
-		var state, gameScene, gameOverScene, startScreen, optionMenu, id;
+        //Define variables that might be used in more
+        //than one function
+        var state, gameScene, gameOverScene, endMessage, startMessage, startScene, optionMenu, id;
 
-		function setup() {
+        function setup() {
             gameScene = new Container();
             stage.addChild(gameScene);
 
             id = resources["images/sheet.json"].textures;
+
 
             //temp game screen
             tempGameScreen = new Sprite(id["gameSceneHolder.png"]);
@@ -69,55 +70,83 @@
             tempGameScreen.scale.x = 28;
             gameScene.addChild(tempGameScreen);
 
-
-			//Create the `gameOver` scene
-			gameOverScene = new Container();
-			stage.addChild(gameOverScene);
-
-			//Make the `gameOver` scene invisible when the game first starts
-			gameOverScene.visible = false;
-
-			//Create the text sprite and add it to the `gameOver` scene
-			message = new Text(
-			"Game Over.",
-			{font: "64px Futura", fill: "white"}
-			);
-			message.x = 120;
-			message.y = stage.height / 2 - 32;
-			gameOverScene.addChild(message);
-
-			//Capture the keyboard arrow keys
-			var enter = keyboard(13),	// double check
-				left = keyboard(37),
-				up = keyboard(38),
-				right = keyboard(39),
-				down = keyboard(40);
+            gameScene.visible = false;
 
 
+            //Create the 'start' scene
+            startScene = new Container();
+            stage.addChild(startScene);
 
-			//Set the game state
-			state = play;
+            //Create the text sprite and add it to the `gameOver` scene
+            startMessage = new Text(
+            "Acapellago: Press any key to continue.",
+            {font: "64px Futura", fill: "white"}
+            );
+            startMessage.x = 120;
+            startMessage.y = RENDER_HEIGHT / 2 - 32;
+            startScene.addChild(startMessage);
 
-			//Start the game loop
-			gameLoop();
-		}
 
-        function play() {}
-		function gameLoop() {
-			//Loop this function 60 times per second
-			requestAnimationFrame(gameLoop);
+            //Create the `gameOver` scene
+            gameOverScene = new Container();
+            stage.addChild(gameOverScene);
 
-			//Update the current game state
-			state();
+            //Make the `gameOver` scene invisible when the game first starts
+            gameOverScene.visible = false;
 
-			//Render the stage
-			renderer.render(stage);
-		}
+            //Create the text sprite and add it to the `gameOver` scene
+            endMessage = new Text(
+            "Game Over.",
+            {font: "64px Futura", fill: "white"}
+            );
+            endMessage.x = 120;
+            endMessage.y = RENDER_HEIGHT / 2 - 32;
+            gameOverScene.addChild(endMessage);
 
-		function end() {
-			gameScene.visible = false;
-			gameOverScene.visible = true;
-		}
+
+
+
+
+            //Set the game state
+            state = start;
+
+            //Start the game loop
+            gameLoop();
+        }
+
+        //Capture the keyboard arrow keys
+        var enter = keyboard(13),	// double check
+            left = keyboard(37),
+            up = keyboard(38),
+            right = keyboard(39),
+            down = keyboard(40);
+
+        function start() {
+            if (left.isDown || right.isDown || enter.isDown || up.isDown || down.isDown) {
+                state = play;
+            }
+        }
+
+        function play() {
+            startScene.visible = false;
+            gameScene.visible = true;
+        }
+
+        function gameLoop() {
+            //Loop this function 60 times per second
+            requestAnimationFrame(gameLoop);
+
+            //Update the current game state
+            state();
+
+            //Render the stage
+            renderer.render(stage);
+        }
+
+        function end() {
+            gameScene.visible = false;
+            gameOverScene.visible = true;
+        }
 
         //To change the background color
         renderer.backgroundColor = 0x061639;
@@ -162,5 +191,5 @@
           return key;
         }
     </script>
-	</body>
+    </body>
 </html>
