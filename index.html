@@ -69,7 +69,9 @@
         function init()
         {
               loader
-                .add("images/terrain3.png")
+          		.add("images/bunny.png")
+                .add("images/platform.png")
+                .add("images/platform2.png")
                 .load(setup);
               //The `renderer.view` is just an ordinary `<canvas>` element.
               //Here's how you can reference to add an optional dashed
@@ -83,14 +85,15 @@
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne,
                   menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, startScene, background, optionMenu, id;
-
+            	var bunny, platform, platform2;
+            	var rect = [];
+				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
               function setup() {
                   gameScene = new Container();
                   stage.addChild(gameScene);
 
                   // id = resources["images/terrain.json"].textures;
-
-
+                  
                   // background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   // platform1_info = id["platform1.png"]["frame"];
                   // platform1 = new PIXI.TilingSprite(id["platform1.png"],
@@ -105,6 +108,9 @@
                   // gameScene.addChild(background);
 
                   gameScene.visible = false;
+
+                  createBunny();
+                  generatePlatforms();
 
                   //Create the 'start' scene
                   startScene = new Container();
@@ -225,7 +231,9 @@
 
                   down.press = function() {
                           if (currMenItem < menuItems.length - 1) {
-                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              menuItems[currMenItem].style.fill = '#FFFFFF';
+                              //menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              console.log(menuItems[currMenItem].style);
                               currMenItem++;
                               menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
                           } else {
@@ -266,6 +274,20 @@
                   startScene.visible = false;
                   gameOverScene.visible = false;
                   gameScene.visible = true;
+                  //temporary keypress movement control
+					right.press = function() {
+						bunny.isWalking = true;
+					}
+					right.release = function() {
+						bunny.isWalking = false;
+					}
+					up.press = function() {
+						bunny.isJumping = true;
+					};
+					up.release = function() {
+						bunny.isJumping = false;
+					}
+					bunnyLogic();
               }
 
               function gameLoop() {
@@ -283,7 +305,6 @@
               var endItems;
 
               function end() {
-                  console.log("end");
                   startScene.visible = false; // should be false anyways
                   gameScene.visible = false;
                   gameOverScene.visible = true;
@@ -370,6 +391,250 @@
                 );
                 return key;
               }
+
+            function generatePlatforms() {
+            	var height = 20; // 0 - 9
+            	var gap = 30;
+            	var currX = 80;
+              //PLATFORM 1
+            	platform = new Sprite(resources["images/platform.png"].texture);
+      				platform.x = currX;
+      				platform.y = RENDER_HEIGHT - height * 4;
+      				rect.push(platform);
+              currX += platform.width;
+      				gameScene.addChild(platform);
+      				currX += gap * 6;
+              //PLATFORM 2
+              platform = new Sprite(resources["images/platform.png"].texture);
+      				platform.x = currX;
+      				platform.y = RENDER_HEIGHT - height * 4;
+      				rect.push(platform);
+      				gameScene.addChild(platform);
+              currX += gap * 3;
+              //PLATFORM 3
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 10;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 6;
+              //PLATFORM 4
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 6;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 5
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 10;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 6
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 15;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 7
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 20;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 8
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 25;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 9
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 30;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+            }
+
+            function createBunny() {
+            	// create the main character
+      				bunny = new Sprite(resources["images/bunny.png"].texture);
+      				bunny.x = 100;
+      				bunny.y = RENDER_HEIGHT - 175 - bunny.height - 400;
+      				bunny.vx = 0;
+      				bunny.vy = 0;
+      				bunny.isWalking = false;
+      				bunny.jump = 0;
+      				gameScene.addChild(bunny);
+            }
+
+            function bunnyLogic() {
+            	bunny.y += bunny.vy;
+  	        	bunny.x += bunny.vx;
+  	        	bunny.onground = false;
+  	        	bunny.xcollide = false;
+  	        	bunny.hit = 0;
+  	        	for (var i = 0; i < rect.length; i++) { //  && bunny.hit != 2
+    		   			bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+    		   				if (hit == 2) {
+    			   				bunny.vy = 0;
+    			   				if (direction == 'top') {
+    		        				bunny.y -= depthY;
+    			   					bunny.onground = true;
+    			   					bunny.jump = 0;
+    		        			} else {
+    		        				bunny.y += depthY;
+    		        			}
+    			   			}
+    		   			});
+  	        	}
+  	        	for (var i = 0; i < rect.length; i++) { // && bunny.hit != 1
+  	        		bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  		        		if (hit == 1) {
+  			        		bunny.vx = 0;
+  			   				if (direction == 'left') {
+  			        			bunny.x -= depthX;
+  		        			} else {
+  		        				bunny.x += depthX;
+  		        			}
+  			        		bunny.xcollide = true;
+  			        	}
+  			        });
+  	        	}
+  	           	if (!bunny.onground) {
+      	   				bunny.vy += GRAVITY;
+      	   				if (bunny.isWalking == true) {
+      	   					bunny.vx = WALK_SPEED;
+      	   				}
+      	   				if (bunny.isJumping == true) {
+      	   					if (bunny.jump < 2) {
+      			       		bunny.isJumping = false;
+      							 bunny.onground = false;
+      							 bunny.vy = -JUMP;
+      							 (bunny.jump)++;
+      	   					}
+      	   				}
+  	        	  } else {
+    	        		bunny.jump = 0;
+    	       			if (bunny.isWalking == false) {
+    	               		if (bunny.vx > 0) {
+    		        			bunny.vx -= DECEL_RATE;
+    		        		} else if (bunny.vx < 0) {
+    		        			bunny.vx += DECEL_RATE;
+    		        		}
+    		       		} else {
+    		       			bunny.vx = WALK_SPEED;
+    		       		}
+    		       		if (bunny.isJumping == true) {
+        		       	bunny.isJumping = false;
+        						bunny.onground = false;
+        						bunny.vy = -JUMP;
+        						(bunny.jump)++;
+        					}
+    		       	}
+                if (bunny.x > RENDER_WIDTH || bunny.y > RENDER_HEIGHT) {
+                  gameScene.removeChild(bunny);
+                  state = end;
+                  createBunny();
+                }
+              }
+
+            function collision(r1, r2, callback) {
+      				//Define the variables we'll need to calculate
+      				var hit, direction, combinedHalfWidths, combinedHalfHeights, vx, vy;
+      				//var depthX, depthY; // how deep is the collision
+
+      				//hit will determine whether there's a collision
+      				hit = 0;
+
+      				//Find the center points of each sprite
+      				r1.centerX = r1.x + r1.width / 2; 
+      				r1.centerY = r1.y + r1.height / 2; 
+      				r2.centerX = r2.x + r2.width / 2; 
+      				r2.centerY = r2.y + r2.height / 2; 
+
+      				//Find the half-widths and half-heights of each sprite
+      				r1.halfWidth = r1.width / 2;
+      				r1.halfHeight = r1.height / 2;
+      				r2.halfWidth = r2.width / 2;
+      				r2.halfHeight = r2.height / 2;
+
+      				//Calculate the distance vector between the sprites
+      				vx = r1.centerX - r2.centerX;
+      				vy = r1.centerY - r2.centerY;
+
+      				//Figure out the combined half-widths and half-heights
+      				combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+      				combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+      				// depth = 0 when touching, > 0 when inside, < 0 when not touching at all
+      				depthX = combinedHalfWidths- Math.abs(vx);
+      				depthY = combinedHalfHeights - Math.abs(vy);
+
+    			    // console.log("r1: (" + r1.centerX + ", " + r1.centerY + ")");
+    			    // console.log("r2: (" + r2.centerX + ", " + r2.centerY + ")");
+    			    // console.log("vx: " + vx);
+    			    // console.log("vy: " + vy);
+    			    //Check for a collision on the x axis
+    			    if (Math.abs(vx) <= combinedHalfWidths) {
+
+    			    	//A collision might be occuring. Check for a collision on the y axis
+    			    	if (Math.abs(vy) <= combinedHalfHeights) {
+
+    				    	// console.log("depthX: " + depthX);
+    				    	// console.log("depthY: " + depthY);
+    				      	if (depthX > depthY) { // depthX > depthY // Y collision
+    				      		hit = 2
+    				        	if (vy < 0) {
+    				        		direction = 'top';
+    				        	} else {
+    				        		direction = 'bottom';
+    				        	}
+    				        	/*if (vy < 0) { // r1 is on top of r2
+    				        		direction = 'top';
+    				        	} else {
+    				        		direction = 'bottom';
+    				       		}*/
+    				      	} else if (depthX < depthY) { // depthX < depthY // X collision
+    				      		hit = 1;
+    				      		if (vx < 0) { //r1 is to the left of r2
+    				      			direction = 'left';
+    				      		} else { // r1 is to the right of r2
+    				      			direction = 'right';
+    				      		}
+    				      	} else {
+    				        	hit = 3;
+    				      	}
+    				        //There's definitely a collision happening
+    				    } else {
+
+    				        //There's no collision on the y axis
+    				      hit = 0;
+    				    }
+    				} else {
+
+    				    //There's no collision on the x axis
+    				    hit = 0;
+    				}
+
+    				if (r1.vy > 0) {
+    					if (depthX > 0) {
+    						if (r1.centerY < r2.centerY && depthY < 0 && (r1.centerY + r1.vy) > (r2.centerY - r2.halfHeight)) {
+    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights - GRAVITY;
+    						}
+    					}
+    				}
+
+    			  	//`hit` will be either `true` or `false`
+    			  	callback(hit, direction, depthX, depthY);
+    			  	return hit;
+    			}
         }
 
 
