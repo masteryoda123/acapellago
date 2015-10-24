@@ -37,12 +37,25 @@
         // requestAnimFrame( animate );
 
         // create an new instance of a pixi stage
+        // Texture.baseTexture.height = 780;
+        // Texture.width = 1300;
         var stage = new Container(),
             renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
             document.body.appendChild(renderer.view);
 
+        //     if (Texture.baseTexture == null) {
+        //       alert("null!");
+        //     }
+
+        // Texture.baseTexture.height = 720;
+        // texture.baseTexture.width = 1280;
+
         loader
-          .add("images/sheet.json")
+          .add("images/terrain.json")
+          .load(setup);
+
+        loader
+          .add("images/terrain3.png")
           .load(setup);
 
         //The `renderer.view` is just an ordinary `<canvas>` element.
@@ -55,27 +68,33 @@
 
         //Define variables that might be used in more
         //than one function
-        var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, menuItemTwo, menuItemThree, startScene, optionMenu, id;
+        var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, menuItemTwo, menuItemThree, startScene, optionMenu, id, platform1,
+          platform1_info, background;
 
         function setup() {
+
             gameScene = new Container();
             stage.addChild(gameScene);
 
-            id = resources["images/sheet.json"].textures;
+            // background = new Sprite(resources["images/terrain3.png"].texture);
+
+            // id = resources["images/sheet.json"].textures;
+            id = resources["images/terrain.json"].textures;
 
 
-            //temp game screen
-            // tempGameScreen = new PIXI.Sprite(id["gameSceneHolder.png"]);
-            tempGameScreen = new PIXI.TilingSprite(id["gameSceneHolder.png"],
-                                        RENDER_WIDTH, RENDER_HEIGHT);
-            tempGameScreen.scale.y = 20;
-            tempGameScreen.scale.x = 28;
+            //background
+            background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+            // platform1_info = id["platform1.png"]["frame"];
+            // platform1 = new PIXI.TilingSprite(id["platform1.png"],
+            //                             platform1_info["width"],
+            //                             platform1_info["height"]);
 
-            // tempGameScreen.position.x = 0;
-            // tempGameScreen.position.y = 0;
-            tempGameScreen.tilePosition.x = 0;
-            tempGameScreen.tilePosition.y = 0;
-            gameScene.addChild(tempGameScreen);
+            // platform1.tilePosition.x = platform1_info["x"];
+            // platform1.tilePosition.y = platform1_info["y"];
+            // gameScene.addChild(platform1);
+            background.tilePosition.x = 0;
+            background.tilePosition.y = 0;
+            gameScene.addChild(background);
 
             gameScene.visible = false;
 
@@ -141,7 +160,7 @@
         }
 
         function update () {
-          tempGameScreen.tilePosition.x -= .2;
+          background.tilePosition.x -= .5;
           renderer.render(gameScene);
           requestAnimationFrame(update);
         }
