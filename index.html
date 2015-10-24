@@ -9,16 +9,37 @@
 	<script src="./js/index.js"></script>
 	<!-- <h1>Arcapellago</h1>  -->
     <script>
-        // create an new instance of a pixi stage
-        var stage = new PIXI.Stage(0x66FF99);
 
         // create a renderer instance
-        var renderer = PIXI.autoDetectRenderer(400, 300);
+        var renderer = PIXI.autoDetectRenderer(1280, 720);
+        //Force canvas rendering like this:
+        // var renderer = new PIXI.CanvasRenderer(600, 400);
+
+        //Force WebGL rendering like this:
+        // var renderer = new PIXI.WebGLRenderer(600, 400);
 
         // add the renderer view element to the DOM
         document.body.appendChild(renderer.view);
 
         // requestAnimFrame( animate );
+
+        // create an new instance of a pixi stage
+        var stage = new PIXI.Container();
+
+
+        //The `renderer.view` is just an ordinary `<canvas>` element.
+        //Here's how you can reference to add an optional dashed
+        //border around the canvas
+        // renderer.view.style.border = "1px dashed black";
+
+        //To resize the canvas
+        // renderer.resize(512, 512);
+
+        //To change the background color
+        renderer.backgroundColor = 0x061639;
+
+        //Tell the renderer to render the stage
+        renderer.render(stage);
     </script>
 	</body>
 </html>
