@@ -65,9 +65,16 @@
 
 
             //temp game screen
-            tempGameScreen = new Sprite(id["gameSceneHolder.png"]);
+            // tempGameScreen = new PIXI.Sprite(id["gameSceneHolder.png"]);
+            tempGameScreen = new PIXI.TilingSprite(id["gameSceneHolder.png"],
+                                        RENDER_WIDTH, RENDER_HEIGHT);
             tempGameScreen.scale.y = 20;
             tempGameScreen.scale.x = 28;
+
+            // tempGameScreen.position.x = 0;
+            // tempGameScreen.position.y = 0;
+            tempGameScreen.tilePosition.x = 0;
+            tempGameScreen.tilePosition.y = 0;
             gameScene.addChild(tempGameScreen);
 
             gameScene.visible = false;
@@ -103,15 +110,20 @@
             endMessage.y = RENDER_HEIGHT / 2 - 32;
             gameOverScene.addChild(endMessage);
 
-
-
-
+            //background amimate
+            requestAnimationFrame(update);
 
             //Set the game state
             state = start;
 
             //Start the game loop
             gameLoop();
+        }
+
+        function update () {
+          tempGameScreen.tilePosition.x -= .2;
+          renderer.render(gameScene);
+          requestAnimationFrame(update);
         }
 
         //Capture the keyboard arrow keys
