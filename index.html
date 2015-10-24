@@ -49,7 +49,40 @@
 		var gameScene, gameOverScene, startScreen, optionMenu;
 
 		function setup() {
-			
+
+
+
+
+			//Create the `gameOver` scene
+			gameOverScene = new Container();
+			stage.addChild(gameOverScene);
+
+			//Make the `gameOver` scene invisible when the game first starts
+			gameOverScene.visible = false;
+
+			//Create the text sprite and add it to the `gameOver` scene
+			message = new Text(
+			"Game Over.",
+			{font: "64px Futura", fill: "white"}
+			);
+			message.x = 120;
+			message.y = stage.height / 2 - 32;
+			gameOverScene.addChild(message);
+
+			//Capture the keyboard arrow keys
+			var enter = keyboard(13),	// double check
+				left = keyboard(37),
+				up = keyboard(38),
+				right = keyboard(39),
+				down = keyboard(40);
+
+
+
+			//Set the game state
+			state = play;
+
+			//Start the game loop
+			gameLoop();
 		}
 
         //To change the background color
