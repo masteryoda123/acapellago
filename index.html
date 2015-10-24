@@ -231,9 +231,7 @@
 
                   down.press = function() {
                           if (currMenItem < menuItems.length - 1) {
-                              menuItems[currMenItem].style.fill = '#FFFFFF';
-                              //menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
-                              console.log(menuItems[currMenItem].style);
+                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
                               currMenItem++;
                               menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
                           } else {
