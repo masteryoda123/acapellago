@@ -69,7 +69,6 @@
         function init()
         {
               loader
-                .add("images/terrain.json")
                 .add("images/terrain3.png")
                 .load(setup);
               //The `renderer.view` is just an ordinary `<canvas>` element.
@@ -89,23 +88,21 @@
                   gameScene = new Container();
                   stage.addChild(gameScene);
 
-                  id = resources["images/terrain.json"].textures;
+                  // id = resources["images/terrain.json"].textures;
 
 
-                  background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+                  // background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   // platform1_info = id["platform1.png"]["frame"];
                   // platform1 = new PIXI.TilingSprite(id["platform1.png"],
                   //                             platform1_info["width"],
                   //                             platform1_info["height"]);
 
-                  // tempGameScreen.position.x = 0;
-                  // tempGameScreen.position.y = 0;
                   // platform1.tilePosition.x = platform1_info["x"];
                   // platform1.tilePosition.y = platform1_info["y"];
                   // gameScene.addChild(platform1);
-                  background.tilePosition.x = 0;
-                  background.tilePosition.y = 0;
-                  gameScene.addChild(background);
+                  // background.tilePosition.x = 0;
+                  // background.tilePosition.y = 0;
+                  // gameScene.addChild(background);
 
                   gameScene.visible = false;
 
@@ -204,7 +201,7 @@
               }
 
               function update () {
-                background.tilePosition.x -= 2;
+                // background.tilePosition.x -= 2;
                 renderer.render(gameScene);
                 requestAnimationFrame(update);
               }
