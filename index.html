@@ -46,7 +46,7 @@
 
 		//Define variables that might be used in more
 		//than one function
-		var gameScene, gameOverScene, startScreen, optionMenu;
+		var state, gameScene, gameOverScene, startScreen, optionMenu;
 
 		function setup() {
 
@@ -83,6 +83,22 @@
 
 			//Start the game loop
 			gameLoop();
+		}
+
+		function gameLoop() {
+			//Loop this function 60 times per second
+			requestAnimationFrame(gameLoop);
+
+			//Update the current game state
+			state();
+
+			//Render the stage
+			renderer.render(stage);
+		}
+
+		function end() {
+			gameScene.visible = false;
+			gameOverScene.visible = true;
 		}
 
         //To change the background color
