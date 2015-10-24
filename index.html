@@ -21,7 +21,7 @@
 		Graphics = PIXI.Graphics;
 
         // create a renderer instance
-        var renderer = PIXI.autoDetectRenderer(1280, 720);
+        // var renderer = PIXI.autoDetectRenderer(1280, 720);
         //Force canvas rendering like this:
         // var renderer = new PIXI.CanvasRenderer(600, 400);
 
@@ -29,12 +29,18 @@
         // var renderer = new PIXI.WebGLRenderer(600, 400);
 
         // add the renderer view element to the DOM
-        document.body.appendChild(renderer.view);
+        // document.body.appendChild(renderer.view);
 
         // requestAnimFrame( animate );
 
         // create an new instance of a pixi stage
-        var stage = new PIXI.Container();
+        var stage = new Container(),
+        renderer = autoDetectRenderer(1280, 720);
+        document.body.appendChild(renderer.view);
+
+        loader
+          .add("images/sheet.json")
+          .load(setup);
 
         //The `renderer.view` is just an ordinary `<canvas>` element.
         //Here's how you can reference to add an optional dashed
@@ -49,8 +55,14 @@
 		var state, gameScene, gameOverScene, startScreen, optionMenu;
 
 		function setup() {
+            gameScene = new Container();
+            stage.addChild(gameScene);
 
+            id = resources["images/sheet.json"].textures;
 
+            //temp game screen
+            tempGameScreen = new Sprite(id["gameSceneHolder.png"]);
+            gameScene.addChild(tempGameScreen);
 
 
 			//Create the `gameOver` scene
@@ -106,6 +118,43 @@
 
         //Tell the renderer to render the stage
         renderer.render(stage);
+
+        //The `keyboard` helper function
+        function keyboard(keyCode) {
+          var key = {};
+          key.code = keyCode;
+          key.isDown = false;
+          key.isUp = true;
+          key.press = undefined;
+          key.release = undefined;
+          //The `downHandler`
+          key.downHandler = function(event) {
+            if (event.keyCode === key.code) {
+              if (key.isUp && key.press) key.press();
+              key.isDown = true;
+              key.isUp = false;
+            }
+            event.preventDefault();
+          };
+          //The `upHandler`
+          key.upHandler = function(event) {
+            if (event.keyCode === key.code) {
+              if (key.isDown && key.release) key.release();
+              key.isDown = false;
+              key.isUp = true;
+            }
+            event.preventDefault();
+          };
+
+          //Attach event listeners
+          window.addEventListener(
+            "keydown", key.downHandler.bind(key), false
+          );
+          window.addEventListener(
+            "keyup", key.upHandler.bind(key), false
+          );
+          return key;
+        }
     </script>
 	</body>
 </html>
