@@ -11,14 +11,17 @@
     <script>
 		//Aliases
 		var Container = PIXI.Container,
-		autoDetectRenderer = PIXI.autoDetectRenderer,
-		loader = PIXI.loader,
-		resources = PIXI.loader.resources,
-		TextureCache = PIXI.utils.TextureCache,
-		Texture = PIXI.Texture,
-		Sprite = PIXI.Sprite,
-		Text = PIXI.Text,
-		Graphics = PIXI.Graphics;
+			autoDetectRenderer = PIXI.autoDetectRenderer,
+			loader = PIXI.loader,
+			resources = PIXI.loader.resources,
+			TextureCache = PIXI.utils.TextureCache,
+			Texture = PIXI.Texture,
+			Sprite = PIXI.Sprite,
+			Text = PIXI.Text,
+			Graphics = PIXI.Graphics,
+			RENDER_WIDTH = 1280,
+			RENDER_HEIGHT = 720;
+
 
         // create a renderer instance
         // var renderer = PIXI.autoDetectRenderer(1280, 720);
@@ -35,8 +38,8 @@
 
         // create an new instance of a pixi stage
         var stage = new Container(),
-        renderer = autoDetectRenderer(1280, 720);
-        document.body.appendChild(renderer.view);
+        	renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
+        	document.body.appendChild(renderer.view);
 
         loader
           .add("images/sheet.json")
