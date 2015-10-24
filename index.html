@@ -52,7 +52,7 @@
 
 		//Define variables that might be used in more
 		//than one function
-		var state, gameScene, gameOverScene, startScreen, optionMenu;
+		var state, gameScene, gameOverScene, startScreen, optionMenu, id;
 
 		function setup() {
             gameScene = new Container();
@@ -97,6 +97,7 @@
 			gameLoop();
 		}
 
+        function play() {}
 		function gameLoop() {
 			//Loop this function 60 times per second
 			requestAnimationFrame(gameLoop);
