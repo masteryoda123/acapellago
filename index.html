@@ -72,12 +72,13 @@
                 .add("images/platform.png")
                 .add("images/platform2.png")
                 .add("images/layer3.png")
+                .add("images/layer.png")
                 .load(setup);
 
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage,
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
@@ -90,7 +91,10 @@
                   stage.addChild(gameScene);
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   layer3.alpha = .6;
+                  layer2 = new PIXI.TilingSprite(resources["images/layer.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+                  layer2.alpha = .7;
                   gameScene.addChild(layer3);
+                  gameScene.addChild(layer2);
                   musicalRain();
                   gameScene.visible = false;
 
@@ -270,7 +274,8 @@
                     // musicalRain();
                   }
                 }
-                layer3.tilePosition.x -= 1;
+                layer3.tilePosition.x -= .5;
+                layer2.tilePosition.x -= 1;
                 // background.tilePosition.x -= 2;
                 renderer.render(gameScene);
                 requestAnimationFrame(update);
@@ -392,6 +397,7 @@
                   rect = [];
                   onScreenObj = [];
                   gameScene.addChild(layer3);
+                  gameScene.addChild(layer2);
                   musicalRain();
                   createBunny();
                   generatePlatforms();
