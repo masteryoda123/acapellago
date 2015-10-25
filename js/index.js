@@ -16,7 +16,7 @@ var analyser = audioCtx.createAnalyser();
 
 //set 1024 datapoints
 analyser.fftSize = 2048;
-var DPToHzScaleFactor =  analyser.frequencyBinCount / 20000; 
+var DPToHzScaleFactor =  analyser.frequencyBinCount / 20000;
 
 //Creates input node
 //need to wait until truthy callback occurs
@@ -43,7 +43,7 @@ if (navigator.getUserMedia) {
 //(analyser.fftSize / 8):: about 0 - 2500
 //range (Hz) of the audio
 //NOTE: MAX_FREQ needs to be an int!
-var MAX_FREQ = Math.round(analyser.frequencyBinCount / 40);
+var MAX_FREQ = Math.round(analyser.frequencyBinCount / 22);
 
 //frequency data points
 var dataArray = new Uint8Array(MAX_FREQ);
@@ -66,7 +66,7 @@ var HEIGHT = canvas.height;*/
 //canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
 
-var threshold = 150;
+var threshold = 120;
 function checkLowFreq (height) {
 	if (height > threshold) {
 		//yuda fn
@@ -93,7 +93,7 @@ function thresholdCheck (barHeight, regionIndex) {
 	}
 }
 
-//freq range is non-dynamic at about 20 - 2870 Hz 
+//freq range is non-dynamic at about 20 - 2870 Hz
 function draw() {
 	//drawVisual = requestAnimationFrame(draw);
 
@@ -108,7 +108,7 @@ function draw() {
 
 	var regionTotal = 0;
 	//loop through all data points in each moment, excluding the floored amounts at the high end
-	for (var i = 0; i < REGION_SIZE * NUM_REGIONS; i++) {
+	for (var i = 2; i < REGION_SIZE * NUM_REGIONS; i++) {
 		//(i * NUM_REGIONS) / MAX_FREQ
 		//converts the index from arr of MAX_FREQ to arr of NUM_REGIONS
 		var freqRegionIndex = Math.floor(i * NUM_REGIONS / MAX_FREQ);
@@ -116,12 +116,12 @@ function draw() {
 		//devalues audio where vocals may overlap
 		//NOTE: handles ONLY 2 regions
 		var vocalOverlapIndex = Math.abs((MAX_FREQ / 2) - i);
-		if (vocalOverlapIndex < 5) {
-			regionTotal += dataArray[i] * (vocalOverlapIndex / 5);
+		if (vocalOverlapIndex < 12) {
+			regionTotal += dataArray[i] * (vocalOverlapIndex / 12);
 		} else {
 			regionTotal += dataArray[i];
 		}
-		
+
 		//if flawed, bars will be incorrect and/or missing
 		//index attempts to check last position in a region
 		if (i % REGION_SIZE === REGION_SIZE - 1) {
@@ -135,9 +135,9 @@ function draw() {
 /*			canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
 			canvasCtx.fillRect(x, HEIGHT - barHeight/2, barWidth, barHeight/2); */
 			thresholdCheck(barHeight, freqRegionIndex);
-						
+
 			//move x to next bar pos
-//			x += barWidth + 1; 
+//			x += barWidth + 1;
 		}
 	}
 };
@@ -180,7 +180,7 @@ function centerVocals(freqWidth, minPotentialFreq, maxPotentialFreq) {
 	var avg = sum / 200;
 
 	var avgInHz = avg * DPToHzScaleFactor;
-	
+
 	//make sure scaling won't overlap elsewhere
 	if (avgInHz < minPotentialFreq) {
 		return (avgInHz + freqWidth/2) / DPToHzScaleFactor;
