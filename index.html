@@ -635,7 +635,7 @@
                 platform = new Sprite(resources["images/platform.png"].texture);
                 platform.status = 0;
                 platform.x = currX;
-                platform.y = RENDER_HEIGHT - height * heights[count];
+                platform.y = RENDER_HEIGHT - height * (heights[count] + 6);
                 count++;
                 rect.push(platform);
                 gameScene.addChild(platform);
