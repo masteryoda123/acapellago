@@ -30,7 +30,6 @@
             renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
             document.body.appendChild(renderer.view);
 
-
         //The `renderer.view` is just an ordinary `<canvas>` element.
         //Here's how you can reference to add an optional dashed
         //border around the canvas
@@ -69,31 +68,32 @@
         function init()
         {
               loader
+<<<<<<< Updated upstream
           		.add("images/bunny.png")
                 .add("images/platform.png")
                 .add("images/platform2.png")
+=======
+                .add("images/layer3.png")
+>>>>>>> Stashed changes
                 .load(setup);
-              //The `renderer.view` is just an ordinary `<canvas>` element.
-              //Here's how you can reference to add an optional dashed
-              //border around the canvas
-              // renderer.view.style.border = "1px dashed black";
-
-              //To resize the canvas
-              // renderer.resize(512, 512);
 
               //Define variables that might be used in more
               //than one function
-              var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne,
+              var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
                   menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
 				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
               function setup() {
                   gameScene = new Container();
+                  gameScene.alpha = .7;
                   stage.addChild(gameScene);
 
+<<<<<<< Updated upstream
                   // id = resources["images/terrain.json"].textures;
                   
+=======
+>>>>>>> Stashed changes
                   // background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   // platform1_info = id["platform1.png"]["frame"];
                   // platform1 = new PIXI.TilingSprite(id["platform1.png"],
@@ -106,7 +106,11 @@
                   // background.tilePosition.x = 0;
                   // background.tilePosition.y = 0;
                   // gameScene.addChild(background);
+                  layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
 
+                  layer3.alpha = .6;
+                  gameScene.addChild(layer3);
+                  musicalRain();
                   gameScene.visible = false;
 
                   createBunny();
@@ -115,7 +119,6 @@
                   //Create the 'start' scene
                   startScene = new Container();
                   stage.addChild(startScene);
-
 
                   // add background
                   var startBackground = PIXI.Sprite.fromImage('images/main.png');
@@ -206,7 +209,40 @@
                   gameLoop();
               }
 
+              function musicalRain() {
+                musicalNotes = [];
+                  var musicalNotesString = ["8note", "16note", "sharp", "treble"];
+                  for (var i = 0; i < Math.round(Math.random() * 20 + 10); i++) {
+                    var note;
+                      var rand = Math.round(Math.random() * (musicalNotesString.length-1));
+                    if (i < musicalNotesString.length) {
+                      note = new Sprite.fromImage("images/" + musicalNotesString[i] + ".png");
+                    } else {
+                      note = new Sprite.fromImage("images/" + musicalNotesString[rand] + ".png");
+                    }
+                    var scalefactor = Math.random() + .3;
+                    note.scale.x = scalefactor;
+                    note.scale.y = scalefactor;
+                    note.position.x = Math.round(Math.random() * RENDER_WIDTH);
+                    note.position.y = Math.round(Math.random() * 10) -20;
+                    gameScene.addChild(note);
+                    musicalNotes[i] = note;
+                  }
+              }
+
               function update () {
+
+                for (var i = 0; i < musicalNotes.length; i++) {
+                  musicalNotes[i].position.x -= 2;
+                  musicalNotes[i].position.y += Math.random() * 5 + 1;
+                  if (musicalNotes[i].position.y > RENDER_HEIGHT ||
+                      musicalNotes[i].position.x < 0) {
+                    musicalNotes[i].position.y = 0;
+                    musicalNotes[i].position.x = Math.random() * RENDER_WIDTH;
+                    // musicalRain();
+                  }
+                }
+                layer3.tilePosition.x -= 1;
                 // background.tilePosition.x -= 2;
                 renderer.render(gameScene);
                 requestAnimationFrame(update);
@@ -348,7 +384,7 @@
               }
 
               //To change the background color
-              renderer.backgroundColor = 0x061639;
+              renderer.backgroundColor = 0xFFFFFF;
 
               //Tell the renderer to render the stage
               renderer.render(stage);
