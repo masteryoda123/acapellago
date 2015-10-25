@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <title>Arcapellago</title>
     <link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
+    <style>
+      body {
+        width: 1280px;
+        height: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
 </head>
 <body>
     <script src="./pixi.js/bin/pixi.js"></script>
@@ -72,30 +80,49 @@
                 .add("images/platform.png")
                 .add("images/platform2.png")
                 .add("images/layer3.png")
+                .add("images/layer.png")
                 .load(setup);
 
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage,
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText, highScoreText,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
-            	var bunny, platform, platform2;
+            	var bunny, platform, platform2, tutorialScene, tutorialTitle, tutorialInstr1, tutorialInstr2, tutorialInstr3;
             	var rect = [];
-				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
+              var onScreenObj = [];
+				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
+              var firstLoad = true;
+              var highScore = 0;
+              var score = 0;
+              var currRect;
               function setup() {
                   gameScene = new Container();
-                  gameScene.alpha = 0.7;
                   stage.addChild(gameScene);
-
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   layer3.alpha = .6;
+                  layer2 = new PIXI.TilingSprite(resources["images/layer.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+                  layer2.alpha = .7;
                   gameScene.addChild(layer3);
+                  gameScene.addChild(layer2);
                   musicalRain();
+
+                  // text for counter
+                  counterText = new Text("Score: " + Math.floor(score), {font: '64px Play', fill:'white', align: 'left'});
+                  counterText.x = 10;
+                  counterText.y = 10;
+                  gameScene.addChild(counterText);
+
+                  // text for highScore
+                  highScoreText = new Text("High Score: " + highScore, {font: '25px Play', fill:'white', align: 'left'});
+                  highScoreText.x = 10;
+                  highScoreText.y = 80;
+                  gameScene.addChild(highScoreText);
+
                   gameScene.visible = false;
 
                   createBunny();
                   generatePlatforms();
-
                   //Create the 'start' scene
                   startScene = new Container();
                   stage.addChild(startScene);
@@ -170,7 +197,6 @@
                   endMessage.y = RENDER_HEIGHT / 8 - endMessage.height / 8;
                   gameOverScene.addChild(endMessage);
 
-
                   endItemOne = new Text("Play Again", menuItemStyle);
                   endItemOne.x = RENDER_WIDTH / 2 - endItemOne.width / 2;
                   endItemOne.y = 3 * RENDER_HEIGHT / 8 - endItemOne.height / 8;
@@ -186,6 +212,40 @@
                   endItemThree.y = 5 * RENDER_HEIGHT / 8 - endItemThree.height / 8;
                   gameOverScene.addChild(endItemThree);
 
+                  /******
+                  * Add 'tutorial' scene
+                  */
+                  tutorialScene = new Container();
+                  stage.addChild(tutorialScene);
+                  tutorialScene.visible = false;
+                  // background for tutorial
+                  var gradientBackground3 = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground3.alpha = 0.9;
+                  tutorialScene.addChild(gradientBackground3);
+                  tutorialScene.filters = [grayFilter2];
+                  // text
+                  tutorialTitle = new Text("Welcome to the Acapellago tutorial!", {font: '64px Play', fill:'#FFFFFF'});
+                  tutorialTitle.x = RENDER_WIDTH / 2 - tutorialTitle.width / 2;
+                  tutorialTitle.y = RENDER_HEIGHT / 8 - tutorialTitle.height / 8;
+                  tutorialScene.addChild(tutorialTitle);
+
+                  tutorialInstr1 = new Text("To walk, make a low-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr1.x = RENDER_WIDTH / 4 - tutorialInstr1.width / 2;
+                  tutorialInstr1.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr1.height / 8;
+                  tutorialScene.addChild(tutorialInstr1);
+
+                  tutorialInstr2 = new Text("Now to jump, make a high-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr2.x = 2 * RENDER_WIDTH / 4 - tutorialInstr2.width / 2;
+                  tutorialInstr2.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr2.height / 8;
+                  tutorialScene.addChild(tutorialInstr2);
+                  tutorialInstr2.visible = false;
+
+
+                  tutorialInstr3 = new Text("Now double jump!\nMake two high-pitch sounds in a row.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr3.x = 3 * RENDER_WIDTH / 4 - tutorialInstr3.width / 2;
+                  tutorialInstr3.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr3.height / 8;
+                  tutorialScene.addChild(tutorialInstr3);
+                  tutorialInstr3.visible = false;
 
                   //Create the `youWon` scene
                   winScene = new Container();
@@ -252,6 +312,7 @@
                     note.scale.y = scalefactor;
                     note.position.x = Math.round(Math.random() * RENDER_WIDTH);
                     note.position.y = Math.round(Math.random() * 10) -20;
+                    note.alpha = 0.8;
                     gameScene.addChild(note);
                     musicalNotes[i] = note;
                   }
@@ -269,7 +330,8 @@
                     // musicalRain();
                   }
                 }
-                layer3.tilePosition.x -= 1;
+                layer3.tilePosition.x -= .5;
+                layer2.tilePosition.x -= 1;
                 // background.tilePosition.x -= 2;
                 renderer.render(gameScene);
                 requestAnimationFrame(update);
@@ -321,7 +383,7 @@
                       if (menuItems[currMenItem] === menuItemOne) {
                           state = play;
                       } else if (menuItems[currMenItem] === menuItemTwo) {
-                          state = end;
+                          state = tutorial;
                       } else {
                           state = win;
                       }
@@ -330,27 +392,49 @@
               }
 
               /**
+                Tutorial
+              */
+              function tutorial() {
+                  startScene.visible = false;
+                  tutorialScene.visible = true;
+              }
+
+              /**
                   Main Game Function
               */
               function play() {
+                  if (firstLoad) {
+                    onScreenObj = [];
+                    for (var i = 0; i < rect.length; i++) {
+                      if (rect[i].x < RENDER_WIDTH) {
+                        onScreenObj.push(rect[i]);
+                      }
+                    }
+                    //onScreenObj.push(bunny);
+                    firstLoad = false;
+                  }
+                  moveStage();
+
                   startScene.visible = false;
                   winScene.visible = false;
                   gameOverScene.visible = false;
                   gameScene.visible = true;
                   //temporary keypress movement control
-					right.press = function() {
-						bunny.isWalking = true;
-					}
-					right.release = function() {
-						bunny.isWalking = false;
-					}
-					up.press = function() {
-						bunny.isJumping = true;
-					};
-					up.release = function() {
-						bunny.isJumping = false;
-					}
-					bunnyLogic();
+        					right.press = function() {
+        						bunny.isWalking = true;
+        					}
+        					right.release = function() {
+        						bunny.isWalking = false;
+        					}
+        					up.press = function() {
+        						bunny.isJumping = true;
+        					};
+        					up.release = function() {
+        						bunny.isJumping = false;
+        					}
+        					bunnyLogic();
+                  counterText.text = 'Score: ' + score;
+                  highScoreText.text = 'High Score: ' + highScore;
               }
 
               function gameLoop() {
@@ -368,10 +452,29 @@
               var endItems;
 
               function end() {
-                  startScene.visible = false; // should be false anyway
+                  firstLoad = true;
+                  startScene.visible = false; // should be false anyways
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
+                  if (score > highScore) {
+                    highScore = score;
+                  }
+                  score = 0;
+
+                  gameScene.removeChildren();
+                  rect = [];
+                  onScreenObj = [];
+                  gameScene.addChild(layer3);
+
+                  gameScene.addChild(layer2);
+
+                  gameScene.addChild(counterText);
+                  gameScene.addChild(highScoreText)
+
+                  musicalRain();
+                  createBunny();
+                  generatePlatforms();
 
                   endItems = [endItemOne, endItemTwo, endItemThree];
                   endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
@@ -505,79 +608,49 @@
               }
 
             function generatePlatforms() {
-            	var height = 20; // 0 - 9
+            	var height = 20;
             	var gap = 30;
-            	var currX = 80;
-              //PLATFORM 1
-            	platform = new Sprite(resources["images/platform.png"].texture);
-      				platform.x = currX;
-      				platform.y = RENDER_HEIGHT - height * 4;
-      				rect.push(platform);
-              currX += platform.width;
-      				gameScene.addChild(platform);
-      				currX += gap * 6;
-              //PLATFORM 2
-              platform = new Sprite(resources["images/platform.png"].texture);
-      				platform.x = currX;
-      				platform.y = RENDER_HEIGHT - height * 4;
-      				rect.push(platform);
-      				gameScene.addChild(platform);
-              currX += gap * 3;
-              //PLATFORM 3
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 10;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 6;
-              //PLATFORM 4
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 6;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 5
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 10;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 6
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 15;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 7
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 20;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 8
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 25;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 9
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 30;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
+            	var currX = 400;
+              var count = 0;
+              var heights = [];
+              for (var i = 0; i < 750; i++) {
+                if (count >= heights.length) {
+                  count = 0;
+                  heights = getHeightPatterns();
+                }
+                platform = new Sprite(resources["images/platform.png"].texture);
+                platform.status = 0;
+                platform.x = currX;
+                platform.y = RENDER_HEIGHT - height * (heights[count] + 6);
+                count++;
+                rect.push(platform);
+                gameScene.addChild(platform);
+                currX += platform.width + gap * 1;
+              }
+            }
+
+            function getHeightPatterns() {
+              var heights = [
+                [15, 9, 15, 21],
+                [15, 18, 18, 21],
+                [15, 12, 15, 18],
+                [15, 15, 18, 21, 24, 18, 12, 9],
+                [15, 12, 9, 12],
+                [15, 18, 24, 15],
+                [15, 9, 12, 15],
+                [15, 9, 9, 12],
+                [15, 18, 21, 15, 9, 3, 6, 12],
+                [15, 21, 24, 27, 21, 18, 12, 9],
+                [15, 21, 24, 18]
+              ];
+              var rand = Math.floor((Math.random() * heights.length));
+              return heights[rand];
             }
 
             function createBunny() {
             	// create the main character
       				bunny = new Sprite(resources["images/bunny.png"].texture);
-      				bunny.x = 100;
+      				bunny.x = 400;
       				bunny.y = RENDER_HEIGHT - 175 - bunny.height - 400;
       				bunny.vx = 0;
       				bunny.vy = 0;
@@ -586,28 +659,68 @@
       				gameScene.addChild(bunny);
             }
 
+            function moveStage() {
+              bunny.x -= 1;
+              var index = 0;
+              for(var i = 0; i < rect.length; i++) {
+                if (rect[i].status != 2) {
+                  rect[i].x -= 1;
+                  if (rect[i].status == 0) {
+                    if (rect[i].x <= RENDER_WIDTH) {
+                      //TODO: push rect[i] into onScreenObj
+                      rect[i].status = 1;
+                      onScreenObj.push(rect[i]);
+                    }
+                  } else if (rect[i].status == 1) {
+                    if (rect[i].x + rect[i].width <= 0) {
+                      //TODO: pop rect[i] off onScreenObj
+                      index = onScreenObj.indexOf(rect[i]);
+                      if (index > -1) {
+                        onScreenObj.splice(index, 1);
+                        rect[i].status = 2;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            function movePlatforms(speed) {
+              bunny.vx = 0;
+              for(var i = 0; i < rect.length; i++) {
+                rect[i].x -= speed;
+              }
+            }
+
             function bunnyLogic() {
             	bunny.y += bunny.vy;
   	        	bunny.x += bunny.vx;
   	        	bunny.onground = false;
   	        	bunny.xcollide = false;
   	        	bunny.hit = 0;
-  	        	for (var i = 0; i < rect.length; i++) { //  && bunny.hit != 2
-    		   			bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  	        	for (var i = 0; i < onScreenObj.length; i++) { //  && bunny.hit != 2
+    		   			bunny.hit = collision(bunny, onScreenObj[i], function(hit, direction, depthX, depthY) {
     		   				if (hit == 2) {
     			   				bunny.vy = 0;
     			   				if (direction == 'top') {
-    		        				bunny.y -= depthY;
+                      if (currRect != onScreenObj[i]) {
+                        score++;
+                        if (score > highScore) {
+                          highScore = score;
+                        }
+                        currRect = onScreenObj[i];
+                      }
+    		        			bunny.y -= depthY;
     			   					bunny.onground = true;
     			   					bunny.jump = 0;
-    		        			} else {
-    		        				bunny.y += depthY;
-    		        			}
+  		        			} else {
+  		        				bunny.y += depthY;
+  		        			}
     			   			}
     		   			});
   	        	}
-  	        	for (var i = 0; i < rect.length; i++) { // && bunny.hit != 1
-  	        		bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  	        	for (var i = 0; i < onScreenObj.length; i++) { // && bunny.hit != 1
+  	        		bunny.hit = collision(bunny, onScreenObj[i], function(hit, direction, depthX, depthY) {
   		        		if (hit == 1) {
   			        		bunny.vx = 0;
   			   				if (direction == 'left') {
@@ -622,11 +735,16 @@
   	           	if (!bunny.onground) {
       	   				bunny.vy += GRAVITY;
       	   				if (bunny.isWalking == true) {
-      	   					bunny.vx = WALK_SPEED;
+                    if (bunny.x >= RENDER_WIDTH / 2) {
+                      //bunny.x = RENDER_WIDTH / 2;
+                      movePlatforms(WALK_SPEED);
+                    } else {
+                      bunny.vx = WALK_SPEED;
+                    }
       	   				}
       	   				if (bunny.isJumping == true) {
       	   					if (bunny.jump < 2) {
-      			       		bunny.isJumping = false;
+      			       	 bunny.isJumping = false;
       							 bunny.onground = false;
       							 bunny.vy = -JUMP;
       							 (bunny.jump)++;
@@ -635,13 +753,18 @@
   	        	  } else {
     	        		bunny.jump = 0;
     	       			if (bunny.isWalking == false) {
-    	               		if (bunny.vx > 0) {
+  	               	if (bunny.vx > 0) {
     		        			bunny.vx -= DECEL_RATE;
     		        		} else if (bunny.vx < 0) {
     		        			bunny.vx += DECEL_RATE;
     		        		}
     		       		} else {
-    		       			bunny.vx = WALK_SPEED;
+                    if (bunny.x >= RENDER_WIDTH / 2) {
+                      //bunny.x = RENDER_WIDTH / 2;
+                      movePlatforms(WALK_SPEED);
+                    } else {
+                      bunny.vx = WALK_SPEED;
+                    }
     		       		}
     		       		if (bunny.isJumping == true) {
         		       	bunny.isJumping = false;
@@ -650,10 +773,10 @@
         						(bunny.jump)++;
         					}
     		       	}
-                if (bunny.x > RENDER_WIDTH || bunny.y > RENDER_HEIGHT) {
+                if ((bunny.x + bunny.width) < 0
+                  || bunny.y > RENDER_HEIGHT) {
                   gameScene.removeChild(bunny);
                   state = end;
-                  createBunny();
                 }
               }
 
@@ -738,7 +861,7 @@
     				if (r1.vy > 0) {
     					if (depthX > 0) {
     						if (r1.centerY < r2.centerY && depthY < 0 && (r1.centerY + r1.vy) > (r2.centerY - r2.halfHeight)) {
-    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights - GRAVITY;
+    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights;
     						}
     					}
     				}
