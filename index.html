@@ -68,13 +68,10 @@
         function init()
         {
               loader
-<<<<<<< Updated upstream
           		.add("images/bunny.png")
                 .add("images/platform.png")
                 .add("images/platform2.png")
-=======
                 .add("images/layer3.png")
->>>>>>> Stashed changes
                 .load(setup);
 
               //Define variables that might be used in more
@@ -89,23 +86,6 @@
                   gameScene.alpha = .7;
                   stage.addChild(gameScene);
 
-<<<<<<< Updated upstream
-                  // id = resources["images/terrain.json"].textures;
-                  
-=======
->>>>>>> Stashed changes
-                  // background = new PIXI.TilingSprite(resources["images/terrain3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
-                  // platform1_info = id["platform1.png"]["frame"];
-                  // platform1 = new PIXI.TilingSprite(id["platform1.png"],
-                  //                             platform1_info["width"],
-                  //                             platform1_info["height"]);
-
-                  // platform1.tilePosition.x = platform1_info["x"];
-                  // platform1.tilePosition.y = platform1_info["y"];
-                  // gameScene.addChild(platform1);
-                  // background.tilePosition.x = 0;
-                  // background.tilePosition.y = 0;
-                  // gameScene.addChild(background);
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
 
                   layer3.alpha = .6;
@@ -588,10 +568,10 @@
       				hit = 0;
 
       				//Find the center points of each sprite
-      				r1.centerX = r1.x + r1.width / 2; 
-      				r1.centerY = r1.y + r1.height / 2; 
-      				r2.centerX = r2.x + r2.width / 2; 
-      				r2.centerY = r2.y + r2.height / 2; 
+      				r1.centerX = r1.x + r1.width / 2;
+      				r1.centerY = r1.y + r1.height / 2;
+      				r2.centerX = r2.x + r2.width / 2;
+      				r2.centerY = r2.y + r2.height / 2;
 
       				//Find the half-widths and half-heights of each sprite
       				r1.halfWidth = r1.width / 2;
