@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <title>Arcapellago</title>
     <link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
+    <style>
+      body {
+        width: 1280px;
+        height: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
 </head>
 <body>
     <script src="./pixi.js/bin/pixi.js"></script>
@@ -78,7 +86,7 @@
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText,
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText, highScoreText,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
@@ -86,6 +94,8 @@
 				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
               var firstLoad = true;
               var highScore = 0;
+              var score = 0;
+              var currRect;
               function setup() {
                   gameScene = new Container();
                   stage.addChild(gameScene);
@@ -98,10 +108,16 @@
                   musicalRain();
 
                   // text for counter
-                  counterText = new Text("Score: " + highScore, {font: '64px Play', fill:'white', align: 'left'});
+                  counterText = new Text("Score: " + Math.floor(score), {font: '64px Play', fill:'white', align: 'left'});
                   counterText.x = 10;
                   counterText.y = 10;
                   gameScene.addChild(counterText);
+
+                  // text for highScore
+                  highScoreText = new Text("High Score: " + highScore, {font: '25px Play', fill:'white', align: 'left'});
+                  highScoreText.x = 10;
+                  highScoreText.y = 80;
+                  gameScene.addChild(highScoreText);
 
                   gameScene.visible = false;
 
@@ -376,8 +392,8 @@
         						bunny.isJumping = false;
         					}
         					bunnyLogic();
-                            counterText.text = 'Score: ' + highScore;
-
+                  counterText.text = 'Score: ' + score;
+                  highScoreText.text = 'High Score: ' + highScore;
               }
 
               function gameLoop() {
@@ -400,7 +416,10 @@
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
-                  highScore = 0;
+                  if (score > highScore) {
+                    highScore = score;
+                  }
+                  score = 0;
 
                   gameScene.removeChildren();
                   rect = [];
@@ -410,6 +429,7 @@
                   gameScene.addChild(layer2);
 
                   gameScene.addChild(counterText);
+                  gameScene.addChild(highScoreText)
 
                   musicalRain();
                   createBunny();
@@ -550,81 +570,6 @@
             	var height = 20;
             	var gap = 30;
             	var currX = 400;
-              /*//PLATFORM 1
-            	platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-      				platform.x = currX;
-      				platform.y = RENDER_HEIGHT - height * 4;
-      				rect.push(platform);
-              currX += platform.width;
-      				gameScene.addChild(platform);
-      				currX += gap * 6;
-              //PLATFORM 2
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-      				platform.x = currX;
-      				platform.y = RENDER_HEIGHT - height * 4;
-      				rect.push(platform);
-      				gameScene.addChild(platform);
-              currX += gap * 3;
-              //PLATFORM 3
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 10;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 6;
-              //PLATFORM 4
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 6;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 5
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 10;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 6
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 15;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 7
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 20;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 8
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 23;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;
-              //PLATFORM 9
-              platform = new Sprite(resources["images/platform.png"].texture);
-              platform.status = 0;
-              platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 33;
-              platform.scale.x = 2;
-              rect.push(platform);
-              gameScene.addChild(platform);
-              currX += gap * 4;*/
-              //PLATFORM 10 - 100
               var count = 0;
               var heights = [];
               for (var i = 0; i < 750; i++) {
@@ -645,16 +590,17 @@
 
             function getHeightPatterns() {
               var heights = [
-                [15, 12, 18, 21],
+                [15, 9, 15, 21],
                 [15, 18, 18, 21],
                 [15, 12, 15, 18],
-                [15, 15, 18, 21, 24, 18, 12, 12],
+                [15, 15, 18, 21, 24, 18, 12, 9],
                 [15, 12, 9, 12],
                 [15, 18, 24, 15],
                 [15, 9, 12, 15],
                 [15, 9, 9, 12],
                 [15, 18, 21, 15, 9, 3, 6, 12],
-                [15, 18, 21, 24, 27, 21, 21, 18]
+                [15, 21, 24, 27, 21, 18, 12, 9],
+                [15, 21, 24, 18]
               ];
               var rand = Math.floor((Math.random() * heights.length));
               return heights[rand];
@@ -708,7 +654,6 @@
             function bunnyLogic() {
             	bunny.y += bunny.vy;
   	        	bunny.x += bunny.vx;
-              highScore += bunny.vx;
   	        	bunny.onground = false;
   	        	bunny.xcollide = false;
   	        	bunny.hit = 0;
@@ -717,12 +662,19 @@
     		   				if (hit == 2) {
     			   				bunny.vy = 0;
     			   				if (direction == 'top') {
+                      if (currRect != onScreenObj[i]) {
+                        score++;
+                        if (score > highScore) {
+                          highScore = score;
+                        }
+                        currRect = onScreenObj[i];
+                      }
     		        			bunny.y -= depthY;
     			   					bunny.onground = true;
     			   					bunny.jump = 0;
-    		        			} else {
-    		        				bunny.y += depthY;
-    		        			}
+  		        			} else {
+  		        				bunny.y += depthY;
+  		        			}
     			   			}
     		   			});
   	        	}
@@ -780,7 +732,7 @@
         						(bunny.jump)++;
         					}
     		       	}
-                if (bunny.x < 0
+                if ((bunny.x + bunny.width) < 0
                   || bunny.y > RENDER_HEIGHT) {
                   gameScene.removeChild(bunny);
                   state = end;
