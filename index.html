@@ -78,7 +78,7 @@
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2,
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
@@ -96,6 +96,13 @@
                   gameScene.addChild(layer3);
                   gameScene.addChild(layer2);
                   musicalRain();
+
+                  // text for counter
+                  counterText = new Text("Score: " + highScore, {font: '64px Play', fill:'white', align: 'left'});
+                  counterText.x = 10;
+                  counterText.y = 10;
+                  gameScene.addChild(counterText);
+
                   gameScene.visible = false;
 
                   createBunny();
@@ -369,6 +376,8 @@
         						bunny.isJumping = false;
         					}
         					bunnyLogic();
+                            counterText.text = 'Score: ' + highScore;
+
               }
 
               function gameLoop() {
@@ -397,7 +406,11 @@
                   rect = [];
                   onScreenObj = [];
                   gameScene.addChild(layer3);
+
                   gameScene.addChild(layer2);
+
+                  gameScene.addChild(counterText);
+
                   musicalRain();
                   createBunny();
                   generatePlatforms();
