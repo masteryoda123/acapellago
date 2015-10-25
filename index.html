@@ -15,6 +15,9 @@
 </head>
 <body>
     <script src="./pixi.js/bin/pixi.js"></script>
+    <script>
+        var startWalking, stopWalking, startJump, stopJump;
+    </script>
     <script src="./js/index.js"></script>
     <!-- <h1>Arcapellago</h1>  -->
     <script>
@@ -420,18 +423,19 @@
                   gameOverScene.visible = false;
                   gameScene.visible = true;
                   //temporary keypress movement control
-        					right.press = function() {
+        					startWalking = function() {
         						bunny.isWalking = true;
-        					}
-        					right.release = function() {
+        					};
+        					stopWalking = function() {
         						bunny.isWalking = false;
-        					}
-        					up.press = function() {
+        					};
+        					startJump = function() {
         						bunny.isJumping = true;
         					};
-        					up.release = function() {
+        					stopJump = function() {
         						bunny.isJumping = false;
-        					}
+        					};
+                  draw();
         					bunnyLogic();
                   counterText.text = 'Score: ' + score;
                   highScoreText.text = 'High Score: ' + highScore;
