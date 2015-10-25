@@ -88,7 +88,7 @@
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
                   menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText, highScoreText,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
-            	var bunny, platform, platform2;
+            	var bunny, platform, platform2, tutorialScene, tutorialTitle, tutorialInstr;
             	var rect = [];
               var onScreenObj = [];
 				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
@@ -197,7 +197,6 @@
                   endMessage.y = RENDER_HEIGHT / 8 - endMessage.height / 8;
                   gameOverScene.addChild(endMessage);
 
-
                   endItemOne = new Text("Play Again", menuItemStyle);
                   endItemOne.x = RENDER_WIDTH / 2 - endItemOne.width / 2;
                   endItemOne.y = 3 * RENDER_HEIGHT / 8 - endItemOne.height / 8;
@@ -213,6 +212,27 @@
                   endItemThree.y = 5 * RENDER_HEIGHT / 8 - endItemThree.height / 8;
                   gameOverScene.addChild(endItemThree);
 
+                  /******
+                  * Add 'tutorial' scene
+                  */
+                  tutorialScene = new Container();
+                  stage.addChild(tutorialScene);
+                  tutorialScene.visible = false;
+                  // background for tutorial
+                  var gradientBackground3 = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground3.alpha = 0.9;
+                  tutorialScene.addChild(gradientBackground3);
+                  tutorialScene.filters = [grayFilter2];
+                  // text
+                  tutorialTitle = new Text("Welcome to the Acapellago tutorial!", {font: '64px Play', fill:'#FFFFFF'});
+                  tutorialTitle.x = RENDER_WIDTH / 2 - tutorialTitle.width / 2;
+                  tutorialTitle.y = RENDER_HEIGHT / 8 - tutorialTitle.height / 8;
+                  tutorialScene.addChild(tutorialTitle);
+
+                  tutorialInstr = new Text("(Press ENTER to continue)", {font: '32px Play', fill: '#FFFFFF'});
+                  tutorialInstr.x = RENDER_WIDTH / 2 - tutorialInstr.width / 2;
+                  tutorialInstr.y = 2 * RENDER_HEIGHT / 8 - tutorialInstr.height / 8;
+                  tutorialScene.addChild(tutorialInstr);
 
                   //Create the `youWon` scene
                   winScene = new Container();
@@ -350,12 +370,20 @@
                       if (menuItems[currMenItem] === menuItemOne) {
                           state = play;
                       } else if (menuItems[currMenItem] === menuItemTwo) {
-                          state = end;
+                          state = tutorial;
                       } else {
                           state = win;
                       }
                   }
 
+              }
+
+              /**
+                Tutorial
+              */
+              function tutorial() {
+                  startScene.visible = false;
+                  tutorialScene.visible = true;
               }
 
               /**
