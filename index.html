@@ -84,6 +84,7 @@
               var onScreenObj = [];
 				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
               var firstLoad = true;
+              var highScore = 0;
               function setup() {
                   gameScene = new Container();
                   stage.addChild(gameScene);
@@ -385,6 +386,7 @@
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
+                  highScore = 0;
 
                   gameScene.removeChildren();
                   rect = [];
@@ -687,6 +689,7 @@
             function bunnyLogic() {
             	bunny.y += bunny.vy;
   	        	bunny.x += bunny.vx;
+              highScore += bunny.vx;
   	        	bunny.onground = false;
   	        	bunny.xcollide = false;
   	        	bunny.hit = 0;
