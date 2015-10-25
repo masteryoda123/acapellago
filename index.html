@@ -77,17 +77,17 @@
               //Define variables that might be used in more
               //than one function
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
-                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, startScene, background, optionMenu, id;
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage,
+                  winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
 				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
               function setup() {
                   gameScene = new Container();
-                  gameScene.alpha = .7;
+                  gameScene.alpha = 0.7;
                   stage.addChild(gameScene);
 
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
-
                   layer3.alpha = .6;
                   gameScene.addChild(layer3);
                   musicalRain();
@@ -149,6 +149,14 @@
                   gameOverScene = new Container();
                   stage.addChild(gameOverScene);
 
+                  var gradientBackground = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground.alpha = 0.9;
+                  gameOverScene.addChild(gradientBackground);
+                  var grayFilter2 = new PIXI.filters.GrayFilter();
+                  grayFilter2.gray = 0.4;
+                  gameOverScene.filters = [grayFilter2];
+
+
                   //Make the `gameOver` scene invisible when the game first starts
                   gameOverScene.visible = false;
 
@@ -178,6 +186,45 @@
                   endItemThree.y = 5 * RENDER_HEIGHT / 8 - endItemThree.height / 8;
                   gameOverScene.addChild(endItemThree);
 
+
+                  //Create the `youWon` scene
+                  winScene = new Container();
+                  stage.addChild(winScene);
+
+                  //Make the `youWon` scene invisible when the game first starts
+                  winScene.visible = false;
+
+                  // Add background
+                  var gradientBackground2 = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground2.alpha = 0.6;
+                  winScene.addChild(gradientBackground2);
+                  winScene.filters = [grayFilter2];
+
+                  //Create the text sprite and add it to the `youWon` scene
+                  winMessage = new Text(
+                  "Congratulations. You Won!",
+                  {font: "84px Play", fill: "white"}
+                  );
+
+                  winMessage.x = RENDER_WIDTH / 2 - winMessage.width / 2;
+                  winMessage.y = RENDER_HEIGHT / 8 - winMessage.height / 8;
+                  winScene.addChild(winMessage);
+
+
+                  winItemOne = new Text("Play Again", menuItemStyle);
+                  winItemOne.x = RENDER_WIDTH / 2 - winItemOne.width / 2;
+                  winItemOne.y = 3 * RENDER_HEIGHT / 8 - winItemOne.height / 8;
+                  winScene.addChild(winItemOne);
+
+                  winItemTwo = new Text("Start Menu", menuItemStyle);
+                  winItemTwo.x = RENDER_WIDTH / 2 - winItemTwo.width / 2;
+                  winItemTwo.y = 4 * RENDER_HEIGHT / 8 - winItemTwo.height / 8;
+                  winScene.addChild(winItemTwo);
+
+                  winItemThree = new Text("Options", menuItemStyle);
+                  winItemThree.x = RENDER_WIDTH / 2 - winItemThree.width / 2;
+                  winItemThree.y = 5 * RENDER_HEIGHT / 8 - winItemThree.height / 8;
+                  winScene.addChild(winItemThree);
 
                   //background amimate
                   requestAnimationFrame(update);
@@ -240,6 +287,7 @@
 
               function start() {
                   gameOverScene.visible = false;
+                  winScene.visible = false;
                   startScene.visible = true;
 
                   menuItems = [menuItemOne, menuItemTwo, menuItemThree];
@@ -275,7 +323,7 @@
                       } else if (menuItems[currMenItem] === menuItemTwo) {
                           state = end;
                       } else {
-
+                          state = win;
                       }
                   }
 
@@ -286,6 +334,7 @@
               */
               function play() {
                   startScene.visible = false;
+                  winScene.visible = false;
                   gameOverScene.visible = false;
                   gameScene.visible = true;
                   //temporary keypress movement control
@@ -319,8 +368,9 @@
               var endItems;
 
               function end() {
-                  startScene.visible = false; // should be false anyways
+                  startScene.visible = false; // should be false anyway
                   gameScene.visible = false;
+                  winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
 
                   endItems = [endItemOne, endItemTwo, endItemThree];
@@ -362,6 +412,54 @@
 
 
               }
+
+              var currWinItem = 0;
+              var winItems;
+
+              function win() {
+                  startScene.visible = false; // should be false anyway
+                  gameScene.visible = false;
+                  gameOverScene.visible = false;
+                  winScene.visible = true;
+
+                  winItems = [winItemOne, winItemTwo, winItemThree];
+                  winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+
+                  down.press = function() {
+                          if (currWinItem < winItems.length - 1) {
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currWinItem++;
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          } else {
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currWinItem = 0;
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          }
+                  }
+
+                  up.press = function() {
+                      if (currWinItem > 0) {
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currWinItem--;
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      } else {
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currWinItem = winItems.length - 1;
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      }
+                  }
+
+                  enter.press = function() {
+                      if (winItems[currWinItem] === winItemOne) {
+                          state = play;
+                      } else if (winItems[currWinItem] === winItemTwo) {
+                          state = start;
+                      } else {
+
+                      }
+                  }
+              }
+
 
               //To change the background color
               renderer.backgroundColor = 0xFFFFFF;
