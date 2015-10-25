@@ -231,27 +231,27 @@
                   // text
                   tutorialTitle = new Text("Welcome to the Acapellago tutorial!", {font: '64px Play', fill:'#FFFFFF'});
                   tutorialTitle.x = RENDER_WIDTH / 2 - tutorialTitle.width / 2;
-                  tutorialTitle.y = RENDER_HEIGHT / 8 - tutorialTitle.height / 8;
+                  tutorialTitle.y = RENDER_HEIGHT / 6 - tutorialTitle.height / 6;
                   tutorialScene.addChild(tutorialTitle);
 
-                  tutorialInstr1 = new Text("To walk, make a low-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
-                  tutorialInstr1.x = RENDER_WIDTH / 4 - tutorialInstr1.width / 2;
-                  tutorialInstr1.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr1.height / 8;
+                  tutorialInstr1 = new Text("Walk: Hum low-pitch sound.", {font: '36px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr1.x = RENDER_WIDTH / 7;
+                  tutorialInstr1.y = 2 * RENDER_HEIGHT / 6 - tutorialInstr1.height / 6;
                   tutorialScene.addChild(tutorialInstr1);
 
-                  tutorialInstr2 = new Text("Now to jump, make a high-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
-                  tutorialInstr2.x = 2 * RENDER_WIDTH / 4 - tutorialInstr2.width / 2;
-                  tutorialInstr2.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr2.height / 8;
+                  tutorialInstr2 = new Text("Jump: Screech high-pitch sound.", {font: '36px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr2.x = RENDER_WIDTH / 7;
+                  tutorialInstr2.y = 3 * RENDER_HEIGHT / 6 - tutorialInstr2.height / 8;
                   tutorialScene.addChild(tutorialInstr2);
-                  tutorialInstr2.visible = false;
+                  tutorialInstr2.visible = true;
 
-                  tutorialInstr3 = new Text("Now double jump!\nMake two high-pitch sounds in a row.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
-                  tutorialInstr3.x = 3 * RENDER_WIDTH / 4 - tutorialInstr3.width / 2;
-                  tutorialInstr3.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr3.height / 8;
+                  tutorialInstr3 = new Text("Double Jump: Be a monkey (Screech twice or more).", {font: '36px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr3.x = RENDER_WIDTH / 7;
+                  tutorialInstr3.y = 4 * RENDER_HEIGHT / 6 - tutorialInstr3.height / 6;
                   tutorialScene.addChild(tutorialInstr3);
-                  tutorialInstr3.visible = false;
+                  tutorialInstr3.visible = true;
 
-                  //Create the `youWon` scene
+                  //Create the `youWon` scene--> change to Option Menu Later
                   winScene = new Container();
                   stage.addChild(winScene);
 
@@ -260,26 +260,26 @@
 
                   // Add background
                   var gradientBackground2 = PIXI.Sprite.fromImage('images/layer3.png');
-                  gradientBackground2.alpha = 0.6;
+                  gradientBackground2.alpha = 0.9;
                   winScene.addChild(gradientBackground2);
                   winScene.filters = [grayFilter2];
 
                   //Create the text sprite and add it to the `youWon` scene
                   winMessage = new Text(
-                  "Congratulations. You Won!",
-                  {font: "84px Play", fill: "white"}
+                  "Woops! This has not\nbeen implemented yet.",
+                  {font: "84px Play", fill: "white", align:"center"}
                   );
 
                   winMessage.x = RENDER_WIDTH / 2 - winMessage.width / 2;
                   winMessage.y = RENDER_HEIGHT / 8 - winMessage.height / 8;
                   winScene.addChild(winMessage);
 
-
-                  winItemOne = new Text("Play Again", menuItemStyle);
+                  winItemOne = new Text("(Press ENTER to go to main screen.)", menuItemStyle);
                   winItemOne.x = RENDER_WIDTH / 2 - winItemOne.width / 2;
                   winItemOne.y = 3 * RENDER_HEIGHT / 8 - winItemOne.height / 8;
                   winScene.addChild(winItemOne);
 
+                  /** Replace later with options menu
                   winItemTwo = new Text("Start Menu", menuItemStyle);
                   winItemTwo.x = RENDER_WIDTH / 2 - winItemTwo.width / 2;
                   winItemTwo.y = 4 * RENDER_HEIGHT / 8 - winItemTwo.height / 8;
@@ -289,6 +289,7 @@
                   winItemThree.x = RENDER_WIDTH / 2 - winItemThree.width / 2;
                   winItemThree.y = 5 * RENDER_HEIGHT / 8 - winItemThree.height / 8;
                   winScene.addChild(winItemThree);
+                  */
 
                   //background amimate
                   requestAnimationFrame(update);
@@ -360,6 +361,7 @@
               function start() {
                   gameOverScene.visible = false;
                   winScene.visible = false;
+                  tutorialScene.visible = false;
                   startScene.visible = true;
                   menuItems = [menuItemOne, menuItemTwo, menuItemThree];
                   menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
@@ -407,7 +409,9 @@
                   startScene.visible = false;
                   tutorialScene.visible = true;
 
-
+                  enter.press = function() {
+                      state = start;
+                  }
 
               }
 
@@ -525,7 +529,7 @@
                       } else if (endItems[currEndItem] === endItemTwo) {
                           state = start;
                       } else {
-
+                          state = win;
                       }
                   }
 
@@ -540,7 +544,7 @@
                   gameScene.visible = false;
                   gameOverScene.visible = false;
                   winScene.visible = true;
-
+                  /** TO BE ADDED LATER
                   winItems = [winItemOne, winItemTwo, winItemThree];
                   winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
 
@@ -576,6 +580,10 @@
                       } else {
 
                       }
+                  }
+                  */
+                  enter.press = function() {
+                      state = start;
                   }
               }
 
