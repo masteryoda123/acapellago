@@ -1,12 +1,756 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Arcapellago</title>
-	<link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
+    <meta charset="utf-8">
+    <title>Arcapellago</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheets/index.css">
 </head>
 <body>
-	<script src="./pixi.js/bin/pixi.js"></script>
-	<script src="./js/index.js"></script>
-	<h1>Arcapellago</h1> 
-	</body>
+    <script src="./pixi.js/bin/pixi.js"></script>
+    <script src="./js/index.js"></script>
+    <!-- <h1>Arcapellago</h1>  -->
+    <script>
+        //Aliases
+        var Container = PIXI.Container,
+            autoDetectRenderer = PIXI.autoDetectRenderer,
+            loader = PIXI.loader,
+            resources = PIXI.loader.resources,
+            TextureCache = PIXI.utils.TextureCache,
+            Texture = PIXI.Texture,
+            Sprite = PIXI.Sprite,
+            Text = PIXI.Text,
+            Graphics = PIXI.Graphics,
+            RENDER_WIDTH = 1280,
+            RENDER_HEIGHT = 720;
+
+
+        // create a renderer instance
+        // create an new instance of a pixi stage
+        var stage = new Container(),
+            renderer = autoDetectRenderer(RENDER_WIDTH, RENDER_HEIGHT);
+            document.body.appendChild(renderer.view);
+
+        //The `renderer.view` is just an ordinary `<canvas>` element.
+        //Here's how you can reference to add an optional dashed
+        //border around the canvas
+        // renderer.view.style.border = "1px dashed black";
+
+        //To resize the canvas
+        // renderer.resize(512, 512);
+
+        //Define variables that might be used in more
+        //than one function
+
+        window.WebFontConfig = {
+            google: {
+                families: ['Play', 'Snippet']
+            },
+
+            active: function() {
+                //do something
+                init();
+            }
+        };
+
+        // include the web-font loader script
+        /* jshint ignore:start */
+        (function() {
+            var wf = document.createElement('script');
+            wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+                '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+            wf.type = 'text/javascript';
+            wf.async = 'true';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wf, s);
+        })();
+        /* jshint ignore:end */
+
+        function init()
+        {
+              loader
+          		.add("images/bunny.png")
+                .add("images/platform.png")
+                .add("images/platform2.png")
+                .add("images/layer3.png")
+                .load(setup);
+
+              //Define variables that might be used in more
+              //than one function
+              var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
+                  menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage,
+                  winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
+            	var bunny, platform, platform2;
+            	var rect = [];
+				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
+              function setup() {
+                  gameScene = new Container();
+                  gameScene.alpha = 0.7;
+                  stage.addChild(gameScene);
+
+                  layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
+                  layer3.alpha = .6;
+                  gameScene.addChild(layer3);
+                  musicalRain();
+                  gameScene.visible = false;
+
+                  createBunny();
+                  generatePlatforms();
+
+                  //Create the 'start' scene
+                  startScene = new Container();
+                  stage.addChild(startScene);
+
+                  // add background
+                  var startBackground = PIXI.Sprite.fromImage('images/main.png');
+                  startBackground.alpha = 1;
+
+                  var blurFilter1 = new PIXI.filters.BlurFilter();
+                  blurFilter1.blur = 0.5;
+
+                  var grayFilter1 = new PIXI.filters.GrayFilter();
+                  grayFilter1.gray = 0.25;
+
+                  startBackground.filters = [grayFilter1, blurFilter1];
+
+
+                  startScene.addChild(startBackground);
+
+                  //Create the text sprite and add it to the `gameOver` scene
+                  startMessage = new Text(
+                  'Acapellago',
+                  {font: '84px Play', fill: 'white', align: 'center'}
+                  );
+                  startMessage.x = RENDER_WIDTH / 2 - startMessage.width / 2;
+                  startMessage.y = RENDER_HEIGHT / 8 - startMessage.height / 8;
+                  startScene.addChild(startMessage);
+
+                  var menuItemStyle = {
+                      font: '48px  Play',
+                      fill: 'white'
+                  }
+
+                  menuItemOne = new Text("Play", menuItemStyle);
+                  menuItemOne.x = RENDER_WIDTH / 2 - menuItemOne.width / 2;
+                  menuItemOne.y = 3 * RENDER_HEIGHT / 8 - menuItemOne.height / 8;
+                  startScene.addChild(menuItemOne);
+
+                  menuItemTwo = new Text("Tutorial", menuItemStyle);
+                  menuItemTwo.x = RENDER_WIDTH / 2 - menuItemTwo.width / 2;
+                  menuItemTwo.y = 4 * RENDER_HEIGHT / 8 - menuItemTwo.height / 8;
+                  startScene.addChild(menuItemTwo);
+
+                  menuItemThree = new Text("Settings", menuItemStyle);
+                  menuItemThree.x = RENDER_WIDTH / 2 - menuItemThree.width / 2;
+                  menuItemThree.y = 5 * RENDER_HEIGHT / 8 - menuItemThree.height / 8;
+                  startScene.addChild(menuItemThree);
+                  /** END START SCREEN */
+
+                  //Create the `gameOver` scene
+                  gameOverScene = new Container();
+                  stage.addChild(gameOverScene);
+
+                  var gradientBackground = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground.alpha = 0.9;
+                  gameOverScene.addChild(gradientBackground);
+                  var grayFilter2 = new PIXI.filters.GrayFilter();
+                  grayFilter2.gray = 0.4;
+                  gameOverScene.filters = [grayFilter2];
+
+
+                  //Make the `gameOver` scene invisible when the game first starts
+                  gameOverScene.visible = false;
+
+                  //Create the text sprite and add it to the `gameOver` scene
+                  endMessage = new Text(
+                  "Game Over.",
+                  {font: "84px Play", fill: "white"}
+                  );
+
+                  endMessage.x = RENDER_WIDTH / 2 - endMessage.width / 2;
+                  endMessage.y = RENDER_HEIGHT / 8 - endMessage.height / 8;
+                  gameOverScene.addChild(endMessage);
+
+
+                  endItemOne = new Text("Play Again", menuItemStyle);
+                  endItemOne.x = RENDER_WIDTH / 2 - endItemOne.width / 2;
+                  endItemOne.y = 3 * RENDER_HEIGHT / 8 - endItemOne.height / 8;
+                  gameOverScene.addChild(endItemOne);
+
+                  endItemTwo = new Text("Start Menu", menuItemStyle);
+                  endItemTwo.x = RENDER_WIDTH / 2 - endItemTwo.width / 2;
+                  endItemTwo.y = 4 * RENDER_HEIGHT / 8 - endItemTwo.height / 8;
+                  gameOverScene.addChild(endItemTwo);
+
+                  endItemThree = new Text("Options", menuItemStyle);
+                  endItemThree.x = RENDER_WIDTH / 2 - endItemThree.width / 2;
+                  endItemThree.y = 5 * RENDER_HEIGHT / 8 - endItemThree.height / 8;
+                  gameOverScene.addChild(endItemThree);
+
+
+                  //Create the `youWon` scene
+                  winScene = new Container();
+                  stage.addChild(winScene);
+
+                  //Make the `youWon` scene invisible when the game first starts
+                  winScene.visible = false;
+
+                  // Add background
+                  var gradientBackground2 = PIXI.Sprite.fromImage('images/layer3.png');
+                  gradientBackground2.alpha = 0.6;
+                  winScene.addChild(gradientBackground2);
+                  winScene.filters = [grayFilter2];
+
+                  //Create the text sprite and add it to the `youWon` scene
+                  winMessage = new Text(
+                  "Congratulations. You Won!",
+                  {font: "84px Play", fill: "white"}
+                  );
+
+                  winMessage.x = RENDER_WIDTH / 2 - winMessage.width / 2;
+                  winMessage.y = RENDER_HEIGHT / 8 - winMessage.height / 8;
+                  winScene.addChild(winMessage);
+
+
+                  winItemOne = new Text("Play Again", menuItemStyle);
+                  winItemOne.x = RENDER_WIDTH / 2 - winItemOne.width / 2;
+                  winItemOne.y = 3 * RENDER_HEIGHT / 8 - winItemOne.height / 8;
+                  winScene.addChild(winItemOne);
+
+                  winItemTwo = new Text("Start Menu", menuItemStyle);
+                  winItemTwo.x = RENDER_WIDTH / 2 - winItemTwo.width / 2;
+                  winItemTwo.y = 4 * RENDER_HEIGHT / 8 - winItemTwo.height / 8;
+                  winScene.addChild(winItemTwo);
+
+                  winItemThree = new Text("Options", menuItemStyle);
+                  winItemThree.x = RENDER_WIDTH / 2 - winItemThree.width / 2;
+                  winItemThree.y = 5 * RENDER_HEIGHT / 8 - winItemThree.height / 8;
+                  winScene.addChild(winItemThree);
+
+                  //background amimate
+                  requestAnimationFrame(update);
+
+                  //Set the game state
+                  state = start;
+
+                  //Start the game loop
+                  gameLoop();
+              }
+
+              function musicalRain() {
+                musicalNotes = [];
+                  var musicalNotesString = ["8note", "16note", "sharp", "treble"];
+                  for (var i = 0; i < Math.round(Math.random() * 20 + 10); i++) {
+                    var note;
+                      var rand = Math.round(Math.random() * (musicalNotesString.length-1));
+                    if (i < musicalNotesString.length) {
+                      note = new Sprite.fromImage("images/" + musicalNotesString[i] + ".png");
+                    } else {
+                      note = new Sprite.fromImage("images/" + musicalNotesString[rand] + ".png");
+                    }
+                    var scalefactor = Math.random() + .3;
+                    note.scale.x = scalefactor;
+                    note.scale.y = scalefactor;
+                    note.position.x = Math.round(Math.random() * RENDER_WIDTH);
+                    note.position.y = Math.round(Math.random() * 10) -20;
+                    gameScene.addChild(note);
+                    musicalNotes[i] = note;
+                  }
+              }
+
+              function update () {
+
+                for (var i = 0; i < musicalNotes.length; i++) {
+                  musicalNotes[i].position.x -= 2;
+                  musicalNotes[i].position.y += Math.random() * 5 + 1;
+                  if (musicalNotes[i].position.y > RENDER_HEIGHT ||
+                      musicalNotes[i].position.x < 0) {
+                    musicalNotes[i].position.y = 0;
+                    musicalNotes[i].position.x = Math.random() * RENDER_WIDTH;
+                    // musicalRain();
+                  }
+                }
+                layer3.tilePosition.x -= 1;
+                // background.tilePosition.x -= 2;
+                renderer.render(gameScene);
+                requestAnimationFrame(update);
+              }
+
+              //Capture the keyboard arrow keys
+              var enter = keyboard(13),	// double check
+                  left = keyboard(37),
+                  up = keyboard(38),
+                  right = keyboard(39),
+                  down = keyboard(40);
+
+              var currMenItem = 0;
+              var menuItems;
+
+              function start() {
+                  gameOverScene.visible = false;
+                  winScene.visible = false;
+                  startScene.visible = true;
+
+                  menuItems = [menuItemOne, menuItemTwo, menuItemThree];
+                  menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+
+                  down.press = function() {
+                          if (currMenItem < menuItems.length - 1) {
+                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currMenItem++;
+                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          } else {
+                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currMenItem = 0;
+                              menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          }
+                  }
+
+                  up.press = function() {
+                      if (currMenItem > 0) {
+                          menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currMenItem--;
+                          menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      } else {
+                          menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currMenItem = menuItems.length - 1;
+                          menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      }
+                  }
+
+                  enter.press = function() {
+                      if (menuItems[currMenItem] === menuItemOne) {
+                          state = play;
+                      } else if (menuItems[currMenItem] === menuItemTwo) {
+                          state = end;
+                      } else {
+                          state = win;
+                      }
+                  }
+
+              }
+
+              /**
+                  Main Game Function
+              */
+              function play() {
+                  startScene.visible = false;
+                  winScene.visible = false;
+                  gameOverScene.visible = false;
+                  gameScene.visible = true;
+                  //temporary keypress movement control
+					right.press = function() {
+						bunny.isWalking = true;
+					}
+					right.release = function() {
+						bunny.isWalking = false;
+					}
+					up.press = function() {
+						bunny.isJumping = true;
+					};
+					up.release = function() {
+						bunny.isJumping = false;
+					}
+					bunnyLogic();
+              }
+
+              function gameLoop() {
+                  //Loop this function 60 times per second
+                  requestAnimationFrame(gameLoop);
+
+                  //Update the current game state
+                  state();
+
+                  //Render the stage
+                  renderer.render(stage);
+              }
+
+              var currEndItem = 0;
+              var endItems;
+
+              function end() {
+                  startScene.visible = false; // should be false anyway
+                  gameScene.visible = false;
+                  winScene.visible = false;  // shoud be false
+                  gameOverScene.visible = true;
+
+                  endItems = [endItemOne, endItemTwo, endItemThree];
+                  endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+
+                  down.press = function() {
+                          if (currEndItem < endItems.length - 1) {
+                              endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currEndItem++;
+                              endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          } else {
+                              endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currEndItem = 0;
+                              endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          }
+                  }
+
+                  up.press = function() {
+                      if (currEndItem > 0) {
+                          endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currEndItem--;
+                          endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      } else {
+                          endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currEndItem = endItems.length - 1;
+                          endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      }
+                  }
+
+                  enter.press = function() {
+                      if (endItems[currEndItem] === endItemOne) {
+                          state = play;
+                      } else if (endItems[currEndItem] === endItemTwo) {
+                          state = start;
+                      } else {
+
+                      }
+                  }
+
+
+              }
+
+              var currWinItem = 0;
+              var winItems;
+
+              function win() {
+                  startScene.visible = false; // should be false anyway
+                  gameScene.visible = false;
+                  gameOverScene.visible = false;
+                  winScene.visible = true;
+
+                  winItems = [winItemOne, winItemTwo, winItemThree];
+                  winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+
+                  down.press = function() {
+                          if (currWinItem < winItems.length - 1) {
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currWinItem++;
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          } else {
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                              currWinItem = 0;
+                              winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                          }
+                  }
+
+                  up.press = function() {
+                      if (currWinItem > 0) {
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currWinItem--;
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      } else {
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#FFFFFF'};
+                          currWinItem = winItems.length - 1;
+                          winItems[currWinItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
+                      }
+                  }
+
+                  enter.press = function() {
+                      if (winItems[currWinItem] === winItemOne) {
+                          state = play;
+                      } else if (winItems[currWinItem] === winItemTwo) {
+                          state = start;
+                      } else {
+
+                      }
+                  }
+              }
+
+
+              //To change the background color
+              renderer.backgroundColor = 0xFFFFFF;
+
+              //Tell the renderer to render the stage
+              renderer.render(stage);
+
+              //The `keyboard` helper function
+              function keyboard(keyCode) {
+                var key = {};
+                key.code = keyCode;
+                key.isDown = false;
+                key.isUp = true;
+                key.press = undefined;
+                key.release = undefined;
+                //The `downHandler`
+                key.downHandler = function(event) {
+                  if (event.keyCode === key.code) {
+                    if (key.isUp && key.press) key.press();
+                    key.isDown = true;
+                    key.isUp = false;
+                  }
+                  event.preventDefault();
+                };
+                //The `upHandler`
+                key.upHandler = function(event) {
+                  if (event.keyCode === key.code) {
+                    if (key.isDown && key.release) key.release();
+                    key.isDown = false;
+                    key.isUp = true;
+                  }
+                  event.preventDefault();
+                };
+
+                //Attach event listeners
+                window.addEventListener(
+                  "keydown", key.downHandler.bind(key), false
+                );
+                window.addEventListener(
+                  "keyup", key.upHandler.bind(key), false
+                );
+                return key;
+              }
+
+            function generatePlatforms() {
+            	var height = 20; // 0 - 9
+            	var gap = 30;
+            	var currX = 80;
+              //PLATFORM 1
+            	platform = new Sprite(resources["images/platform.png"].texture);
+      				platform.x = currX;
+      				platform.y = RENDER_HEIGHT - height * 4;
+      				rect.push(platform);
+              currX += platform.width;
+      				gameScene.addChild(platform);
+      				currX += gap * 6;
+              //PLATFORM 2
+              platform = new Sprite(resources["images/platform.png"].texture);
+      				platform.x = currX;
+      				platform.y = RENDER_HEIGHT - height * 4;
+      				rect.push(platform);
+      				gameScene.addChild(platform);
+              currX += gap * 3;
+              //PLATFORM 3
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 10;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 6;
+              //PLATFORM 4
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 6;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 5
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 10;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 6
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 15;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 7
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 20;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 8
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 25;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+              //PLATFORM 9
+              platform = new Sprite(resources["images/platform.png"].texture);
+              platform.x = currX;
+              platform.y = RENDER_HEIGHT - height * 30;
+              rect.push(platform);
+              gameScene.addChild(platform);
+              currX += gap * 4;
+            }
+
+            function createBunny() {
+            	// create the main character
+      				bunny = new Sprite(resources["images/bunny.png"].texture);
+      				bunny.x = 100;
+      				bunny.y = RENDER_HEIGHT - 175 - bunny.height - 400;
+      				bunny.vx = 0;
+      				bunny.vy = 0;
+      				bunny.isWalking = false;
+      				bunny.jump = 0;
+      				gameScene.addChild(bunny);
+            }
+
+            function bunnyLogic() {
+            	bunny.y += bunny.vy;
+  	        	bunny.x += bunny.vx;
+  	        	bunny.onground = false;
+  	        	bunny.xcollide = false;
+  	        	bunny.hit = 0;
+  	        	for (var i = 0; i < rect.length; i++) { //  && bunny.hit != 2
+    		   			bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+    		   				if (hit == 2) {
+    			   				bunny.vy = 0;
+    			   				if (direction == 'top') {
+    		        				bunny.y -= depthY;
+    			   					bunny.onground = true;
+    			   					bunny.jump = 0;
+    		        			} else {
+    		        				bunny.y += depthY;
+    		        			}
+    			   			}
+    		   			});
+  	        	}
+  	        	for (var i = 0; i < rect.length; i++) { // && bunny.hit != 1
+  	        		bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  		        		if (hit == 1) {
+  			        		bunny.vx = 0;
+  			   				if (direction == 'left') {
+  			        			bunny.x -= depthX;
+  		        			} else {
+  		        				bunny.x += depthX;
+  		        			}
+  			        		bunny.xcollide = true;
+  			        	}
+  			        });
+  	        	}
+  	           	if (!bunny.onground) {
+      	   				bunny.vy += GRAVITY;
+      	   				if (bunny.isWalking == true) {
+      	   					bunny.vx = WALK_SPEED;
+      	   				}
+      	   				if (bunny.isJumping == true) {
+      	   					if (bunny.jump < 2) {
+      			       		bunny.isJumping = false;
+      							 bunny.onground = false;
+      							 bunny.vy = -JUMP;
+      							 (bunny.jump)++;
+      	   					}
+      	   				}
+  	        	  } else {
+    	        		bunny.jump = 0;
+    	       			if (bunny.isWalking == false) {
+    	               		if (bunny.vx > 0) {
+    		        			bunny.vx -= DECEL_RATE;
+    		        		} else if (bunny.vx < 0) {
+    		        			bunny.vx += DECEL_RATE;
+    		        		}
+    		       		} else {
+    		       			bunny.vx = WALK_SPEED;
+    		       		}
+    		       		if (bunny.isJumping == true) {
+        		       	bunny.isJumping = false;
+        						bunny.onground = false;
+        						bunny.vy = -JUMP;
+        						(bunny.jump)++;
+        					}
+    		       	}
+                if (bunny.x > RENDER_WIDTH || bunny.y > RENDER_HEIGHT) {
+                  gameScene.removeChild(bunny);
+                  state = end;
+                  createBunny();
+                }
+              }
+
+            function collision(r1, r2, callback) {
+      				//Define the variables we'll need to calculate
+      				var hit, direction, combinedHalfWidths, combinedHalfHeights, vx, vy;
+      				//var depthX, depthY; // how deep is the collision
+
+      				//hit will determine whether there's a collision
+      				hit = 0;
+
+      				//Find the center points of each sprite
+      				r1.centerX = r1.x + r1.width / 2;
+      				r1.centerY = r1.y + r1.height / 2;
+      				r2.centerX = r2.x + r2.width / 2;
+      				r2.centerY = r2.y + r2.height / 2;
+
+      				//Find the half-widths and half-heights of each sprite
+      				r1.halfWidth = r1.width / 2;
+      				r1.halfHeight = r1.height / 2;
+      				r2.halfWidth = r2.width / 2;
+      				r2.halfHeight = r2.height / 2;
+
+      				//Calculate the distance vector between the sprites
+      				vx = r1.centerX - r2.centerX;
+      				vy = r1.centerY - r2.centerY;
+
+      				//Figure out the combined half-widths and half-heights
+      				combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+      				combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+      				// depth = 0 when touching, > 0 when inside, < 0 when not touching at all
+      				depthX = combinedHalfWidths- Math.abs(vx);
+      				depthY = combinedHalfHeights - Math.abs(vy);
+
+    			    // console.log("r1: (" + r1.centerX + ", " + r1.centerY + ")");
+    			    // console.log("r2: (" + r2.centerX + ", " + r2.centerY + ")");
+    			    // console.log("vx: " + vx);
+    			    // console.log("vy: " + vy);
+    			    //Check for a collision on the x axis
+    			    if (Math.abs(vx) <= combinedHalfWidths) {
+
+    			    	//A collision might be occuring. Check for a collision on the y axis
+    			    	if (Math.abs(vy) <= combinedHalfHeights) {
+
+    				    	// console.log("depthX: " + depthX);
+    				    	// console.log("depthY: " + depthY);
+    				      	if (depthX > depthY) { // depthX > depthY // Y collision
+    				      		hit = 2
+    				        	if (vy < 0) {
+    				        		direction = 'top';
+    				        	} else {
+    				        		direction = 'bottom';
+    				        	}
+    				        	/*if (vy < 0) { // r1 is on top of r2
+    				        		direction = 'top';
+    				        	} else {
+    				        		direction = 'bottom';
+    				       		}*/
+    				      	} else if (depthX < depthY) { // depthX < depthY // X collision
+    				      		hit = 1;
+    				      		if (vx < 0) { //r1 is to the left of r2
+    				      			direction = 'left';
+    				      		} else { // r1 is to the right of r2
+    				      			direction = 'right';
+    				      		}
+    				      	} else {
+    				        	hit = 3;
+    				      	}
+    				        //There's definitely a collision happening
+    				    } else {
+
+    				        //There's no collision on the y axis
+    				      hit = 0;
+    				    }
+    				} else {
+
+    				    //There's no collision on the x axis
+    				    hit = 0;
+    				}
+
+    				if (r1.vy > 0) {
+    					if (depthX > 0) {
+    						if (r1.centerY < r2.centerY && depthY < 0 && (r1.centerY + r1.vy) > (r2.centerY - r2.halfHeight)) {
+    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights - GRAVITY;
+    						}
+    					}
+    				}
+
+    			  	//`hit` will be either `true` or `false`
+    			  	callback(hit, direction, depthX, depthY);
+    			  	return hit;
+    			}
+        }
+
+
+
+    </script>
+    </body>
 </html>
