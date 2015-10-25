@@ -86,7 +86,6 @@
               var firstLoad = true;
               function setup() {
                   gameScene = new Container();
-                  gameScene.alpha = 0.7;
                   stage.addChild(gameScene);
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   layer3.alpha = .6;
@@ -252,6 +251,7 @@
                     note.scale.y = scalefactor;
                     note.position.x = Math.round(Math.random() * RENDER_WIDTH);
                     note.position.y = Math.round(Math.random() * 10) -20;
+                    note.alpha = 0.8;
                     gameScene.addChild(note);
                     musicalNotes[i] = note;
                   }
