@@ -88,7 +88,7 @@
               var state, gameScene, gameOverScene, endMessage, startMessage, menuItemOne, musicalNotes, layer3,
                   menuItemTwo, menuItemThree, endItemOne, endItemTwo, endItemThree, winMessage, layer2, counterText, highScoreText,
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
-            	var bunny, platform, platform2, tutorialScene, tutorialTitle, tutorialInstr;
+            	var bunny, platform, platform2, tutorialScene, tutorialTitle, tutorialInstr1, tutorialInstr2, tutorialInstr3;
             	var rect = [];
               var onScreenObj = [];
 				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
@@ -229,10 +229,23 @@
                   tutorialTitle.y = RENDER_HEIGHT / 8 - tutorialTitle.height / 8;
                   tutorialScene.addChild(tutorialTitle);
 
-                  tutorialInstr = new Text("(Press ENTER to continue)", {font: '32px Play', fill: '#FFFFFF'});
-                  tutorialInstr.x = RENDER_WIDTH / 2 - tutorialInstr.width / 2;
-                  tutorialInstr.y = 2 * RENDER_HEIGHT / 8 - tutorialInstr.height / 8;
-                  tutorialScene.addChild(tutorialInstr);
+                  tutorialInstr1 = new Text("To walk, make a low-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr1.x = RENDER_WIDTH / 4 - tutorialInstr1.width / 2;
+                  tutorialInstr1.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr1.height / 8;
+                  tutorialScene.addChild(tutorialInstr1);
+
+                  tutorialInstr2 = new Text("Now to jump, make a high-pitch sound.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr2.x = 2 * RENDER_WIDTH / 4 - tutorialInstr2.width / 2;
+                  tutorialInstr2.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr2.height / 8;
+                  tutorialScene.addChild(tutorialInstr2);
+                  tutorialInstr2.visible = false;
+
+
+                  tutorialInstr3 = new Text("Now double jump!\nMake two high-pitch sounds in a row.", {font: '24px Play', fill: '#FFFFFF', align: 'left'});
+                  tutorialInstr3.x = 3 * RENDER_WIDTH / 4 - tutorialInstr3.width / 2;
+                  tutorialInstr3.y = 4.5 * RENDER_HEIGHT / 8 - tutorialInstr3.height / 8;
+                  tutorialScene.addChild(tutorialInstr3);
+                  tutorialInstr3.visible = false;
 
                   //Create the `youWon` scene
                   winScene = new Container();
