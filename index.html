@@ -616,13 +616,6 @@
                 platform.x = currX;
                 platform.y = RENDER_HEIGHT - height * heights[count];
                 count++;
-                /*if (i % 4 == 0 || i % 4 == 1) {
-                  platform.y = RENDER_HEIGHT - height * 15;
-                } else if (i % 4 == 2) {
-                  platform.y = RENDER_HEIGHT - height * 18;
-                } else {
-                  platform.y = RENDER_HEIGHT - height * 21;
-                }*/
                 rect.push(platform);
                 gameScene.addChild(platform);
                 currX += platform.width + gap * 1;
