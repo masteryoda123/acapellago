@@ -10,10 +10,12 @@
         height: 720px;
         margin-left: auto;
         margin-right: auto;
+        margin-top: 20px;
       }
     </style>
 </head>
 <body>
+    <script src= "howler.min.js"></script>
     <script src="./pixi.js/bin/pixi.js"></script>
     <script>
         var startWalking, stopWalking, startJump, stopJump;
@@ -173,6 +175,7 @@
                   menuItemThree.x = RENDER_WIDTH / 2 - menuItemThree.width / 2;
                   menuItemThree.y = 5 * RENDER_HEIGHT / 8 - menuItemThree.height / 8;
                   startScene.addChild(menuItemThree);
+
                   /** END START SCREEN */
 
                   //Create the `gameOver` scene
@@ -191,12 +194,11 @@
                   gameOverScene.visible = false;
 
                   //Create the text sprite and add it to the `gameOver` scene
-                  endMessage = new Text(
-                  "Game Over.",
-                  {font: "84px Play", fill: "white"}
+                  endMessage = new Text(score,
+                  {font: "60px Play", fill: "white", align:'center'}
                   );
 
-                  endMessage.x = RENDER_WIDTH / 2 - endMessage.width / 2;
+                  endMessage.x = RENDER_WIDTH / 2 - endMessage.width * 6;
                   endMessage.y = RENDER_HEIGHT / 8 - endMessage.height / 8;
                   gameOverScene.addChild(endMessage);
 
@@ -295,6 +297,12 @@
                   //Set the game state
                   state = start;
 
+
+                  //music
+                  var sound = new Howl({
+                                      urls: ["assets/mouthMusic.mp3"]
+                                    }).play();
+
                   //Start the game loop
                   gameLoop();
               }
@@ -354,7 +362,6 @@
                   gameOverScene.visible = false;
                   winScene.visible = false;
                   startScene.visible = true;
-
                   menuItems = [menuItemOne, menuItemTwo, menuItemThree];
                   menuItems[currMenItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
 
@@ -461,6 +468,9 @@
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
+                  if (score > 0) {
+                    endMessage.text = "Score: " + score +"\nHighest Score: " + highScore;
+                  }
                   if (score > highScore) {
                     highScore = score;
                   }
@@ -779,6 +789,10 @@
     		       	}
                 if ((bunny.x + bunny.width) < 0
                   || bunny.y > RENDER_HEIGHT) {
+
+                  var sound = new Howl({
+                                    urls: ["assets/fallingOff.mp3"]
+                                  }).play();
                   gameScene.removeChild(bunny);
                   state = end;
                 }
