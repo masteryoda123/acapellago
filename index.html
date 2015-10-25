@@ -81,12 +81,13 @@
                   winItemOne, winItemTwo, winItemThree, winScene, startScene, background, optionMenu, id;
             	var bunny, platform, platform2;
             	var rect = [];
-				var GRAVITY = 2, JUMP = 20, DECEL_RATE = 1, WALK_SPEED = 5;
+              var onScreenObj = [];
+				      var GRAVITY = 1, JUMP = 12, DECEL_RATE = 1, WALK_SPEED = 3;
+              var firstLoad = true;
               function setup() {
                   gameScene = new Container();
                   gameScene.alpha = 0.7;
                   stage.addChild(gameScene);
-
                   layer3 = new PIXI.TilingSprite(resources["images/layer3.png"].texture, RENDER_WIDTH, RENDER_HEIGHT);
                   layer3.alpha = .6;
                   gameScene.addChild(layer3);
@@ -95,7 +96,6 @@
 
                   createBunny();
                   generatePlatforms();
-
                   //Create the 'start' scene
                   startScene = new Container();
                   stage.addChild(startScene);
@@ -333,24 +333,36 @@
                   Main Game Function
               */
               function play() {
+                  if (firstLoad) {
+                    onScreenObj = [];
+                    for (var i = 0; i < rect.length; i++) {
+                      if (rect[i].x < RENDER_WIDTH) {
+                        onScreenObj.push(rect[i]);
+                      }
+                    }
+                    //onScreenObj.push(bunny);
+                    firstLoad = false;
+                  }
+                  moveStage();
+
                   startScene.visible = false;
                   winScene.visible = false;
                   gameOverScene.visible = false;
                   gameScene.visible = true;
                   //temporary keypress movement control
-					right.press = function() {
-						bunny.isWalking = true;
-					}
-					right.release = function() {
-						bunny.isWalking = false;
-					}
-					up.press = function() {
-						bunny.isJumping = true;
-					};
-					up.release = function() {
-						bunny.isJumping = false;
-					}
-					bunnyLogic();
+        					right.press = function() {
+        						bunny.isWalking = true;
+        					}
+        					right.release = function() {
+        						bunny.isWalking = false;
+        					}
+        					up.press = function() {
+        						bunny.isJumping = true;
+        					};
+        					up.release = function() {
+        						bunny.isJumping = false;
+        					}
+        					bunnyLogic();
               }
 
               function gameLoop() {
@@ -368,10 +380,19 @@
               var endItems;
 
               function end() {
-                  startScene.visible = false; // should be false anyway
+                  firstLoad = true;
+                  startScene.visible = false; // should be false anyways
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
+
+                  gameScene.removeChildren();
+                  rect = [];
+                  onScreenObj = [];
+                  gameScene.addChild(layer3);
+                  musicalRain();
+                  createBunny();
+                  generatePlatforms();
 
                   endItems = [endItemOne, endItemTwo, endItemThree];
                   endItems[currEndItem].style = {font: '48px Play', align: 'center', fill: '#090A0A'};
@@ -505,11 +526,12 @@
               }
 
             function generatePlatforms() {
-            	var height = 20; // 0 - 9
+            	var height = 20;
             	var gap = 30;
-            	var currX = 80;
-              //PLATFORM 1
+            	var currX = 400;
+              /*//PLATFORM 1
             	platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
       				platform.x = currX;
       				platform.y = RENDER_HEIGHT - height * 4;
       				rect.push(platform);
@@ -518,6 +540,7 @@
       				currX += gap * 6;
               //PLATFORM 2
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
       				platform.x = currX;
       				platform.y = RENDER_HEIGHT - height * 4;
       				rect.push(platform);
@@ -525,6 +548,7 @@
               currX += gap * 3;
               //PLATFORM 3
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
               platform.y = RENDER_HEIGHT - height * 10;
               rect.push(platform);
@@ -532,6 +556,7 @@
               currX += gap * 6;
               //PLATFORM 4
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
               platform.y = RENDER_HEIGHT - height * 6;
               rect.push(platform);
@@ -539,6 +564,7 @@
               currX += gap * 4;
               //PLATFORM 5
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
               platform.y = RENDER_HEIGHT - height * 10;
               rect.push(platform);
@@ -546,6 +572,7 @@
               currX += gap * 4;
               //PLATFORM 6
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
               platform.y = RENDER_HEIGHT - height * 15;
               rect.push(platform);
@@ -553,6 +580,7 @@
               currX += gap * 4;
               //PLATFORM 7
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
               platform.y = RENDER_HEIGHT - height * 20;
               rect.push(platform);
@@ -560,24 +588,68 @@
               currX += gap * 4;
               //PLATFORM 8
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 25;
+              platform.y = RENDER_HEIGHT - height * 23;
               rect.push(platform);
               gameScene.addChild(platform);
               currX += gap * 4;
               //PLATFORM 9
               platform = new Sprite(resources["images/platform.png"].texture);
+              platform.status = 0;
               platform.x = currX;
-              platform.y = RENDER_HEIGHT - height * 30;
+              platform.y = RENDER_HEIGHT - height * 33;
+              platform.scale.x = 2;
               rect.push(platform);
               gameScene.addChild(platform);
-              currX += gap * 4;
+              currX += gap * 4;*/
+              //PLATFORM 10 - 100
+              var count = 0;
+              var heights = [];
+              for (var i = 0; i < 750; i++) {
+                if (count >= heights.length) {
+                  count = 0;
+                  heights = getHeightPatterns();
+                }
+                platform = new Sprite(resources["images/platform.png"].texture);
+                platform.status = 0;
+                platform.x = currX;
+                platform.y = RENDER_HEIGHT - height * heights[count];
+                count++;
+                /*if (i % 4 == 0 || i % 4 == 1) {
+                  platform.y = RENDER_HEIGHT - height * 15;
+                } else if (i % 4 == 2) {
+                  platform.y = RENDER_HEIGHT - height * 18;
+                } else {
+                  platform.y = RENDER_HEIGHT - height * 21;
+                }*/
+                rect.push(platform);
+                gameScene.addChild(platform);
+                currX += platform.width + gap * 1;
+              }
+            }
+
+            function getHeightPatterns() {
+              var heights = [
+                [15, 15, 18, 21],
+                [15, 18, 18, 21],
+                [15, 12, 15, 18],
+                [15, 15, 18, 21, 24, 21, 21, 18],
+                [15, 12, 9, 12],
+                [15, 15, 15, 15],
+                [15, 12, 15, 15],
+                [15, 15, 12, 15],
+                [15, 12, 9, 9, 12, 15, 18, 18],
+                [15, 18, 21, 24, 27, 24, 21, 18]
+              ];
+              var rand = Math.floor((Math.random() * heights.length));
+              return heights[rand];
             }
 
             function createBunny() {
             	// create the main character
       				bunny = new Sprite(resources["images/bunny.png"].texture);
-      				bunny.x = 100;
+      				bunny.x = 400;
       				bunny.y = RENDER_HEIGHT - 175 - bunny.height - 400;
       				bunny.vx = 0;
       				bunny.vy = 0;
@@ -586,18 +658,51 @@
       				gameScene.addChild(bunny);
             }
 
+            function moveStage() {
+              bunny.x -= 1;
+              var index = 0;
+              for(var i = 0; i < rect.length; i++) {
+                if (rect[i].status != 2) {
+                  rect[i].x -= 1;
+                  if (rect[i].status == 0) {
+                    if (rect[i].x <= RENDER_WIDTH) {
+                      //TODO: push rect[i] into onScreenObj
+                      rect[i].status = 1;
+                      onScreenObj.push(rect[i]);
+                    }
+                  } else if (rect[i].status == 1) {
+                    if (rect[i].x + rect[i].width <= 0) {
+                      //TODO: pop rect[i] off onScreenObj
+                      index = onScreenObj.indexOf(rect[i]);
+                      if (index > -1) {
+                        onScreenObj.splice(index, 1);
+                        rect[i].status = 2;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            function movePlatforms(speed) {
+              bunny.vx = 0;
+              for(var i = 0; i < rect.length; i++) {
+                rect[i].x -= speed;
+              }
+            }
+
             function bunnyLogic() {
             	bunny.y += bunny.vy;
   	        	bunny.x += bunny.vx;
   	        	bunny.onground = false;
   	        	bunny.xcollide = false;
   	        	bunny.hit = 0;
-  	        	for (var i = 0; i < rect.length; i++) { //  && bunny.hit != 2
-    		   			bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  	        	for (var i = 0; i < onScreenObj.length; i++) { //  && bunny.hit != 2
+    		   			bunny.hit = collision(bunny, onScreenObj[i], function(hit, direction, depthX, depthY) {
     		   				if (hit == 2) {
     			   				bunny.vy = 0;
     			   				if (direction == 'top') {
-    		        				bunny.y -= depthY;
+    		        			bunny.y -= depthY;
     			   					bunny.onground = true;
     			   					bunny.jump = 0;
     		        			} else {
@@ -606,8 +711,8 @@
     			   			}
     		   			});
   	        	}
-  	        	for (var i = 0; i < rect.length; i++) { // && bunny.hit != 1
-  	        		bunny.hit = collision(bunny, rect[i], function(hit, direction, depthX, depthY) {
+  	        	for (var i = 0; i < onScreenObj.length; i++) { // && bunny.hit != 1
+  	        		bunny.hit = collision(bunny, onScreenObj[i], function(hit, direction, depthX, depthY) {
   		        		if (hit == 1) {
   			        		bunny.vx = 0;
   			   				if (direction == 'left') {
@@ -622,11 +727,16 @@
   	           	if (!bunny.onground) {
       	   				bunny.vy += GRAVITY;
       	   				if (bunny.isWalking == true) {
-      	   					bunny.vx = WALK_SPEED;
+                    if (bunny.x >= RENDER_WIDTH / 2) {
+                      //bunny.x = RENDER_WIDTH / 2;
+                      movePlatforms(WALK_SPEED);
+                    } else {
+                      bunny.vx = WALK_SPEED;
+                    }
       	   				}
       	   				if (bunny.isJumping == true) {
       	   					if (bunny.jump < 2) {
-      			       		bunny.isJumping = false;
+      			       	 bunny.isJumping = false;
       							 bunny.onground = false;
       							 bunny.vy = -JUMP;
       							 (bunny.jump)++;
@@ -635,13 +745,18 @@
   	        	  } else {
     	        		bunny.jump = 0;
     	       			if (bunny.isWalking == false) {
-    	               		if (bunny.vx > 0) {
+  	               	if (bunny.vx > 0) {
     		        			bunny.vx -= DECEL_RATE;
     		        		} else if (bunny.vx < 0) {
     		        			bunny.vx += DECEL_RATE;
     		        		}
     		       		} else {
-    		       			bunny.vx = WALK_SPEED;
+                    if (bunny.x >= RENDER_WIDTH / 2) {
+                      //bunny.x = RENDER_WIDTH / 2;
+                      movePlatforms(WALK_SPEED);
+                    } else {
+                      bunny.vx = WALK_SPEED;
+                    }
     		       		}
     		       		if (bunny.isJumping == true) {
         		       	bunny.isJumping = false;
@@ -650,10 +765,10 @@
         						(bunny.jump)++;
         					}
     		       	}
-                if (bunny.x > RENDER_WIDTH || bunny.y > RENDER_HEIGHT) {
+                if (bunny.x < 0
+                  || bunny.y > RENDER_HEIGHT) {
                   gameScene.removeChild(bunny);
                   state = end;
-                  createBunny();
                 }
               }
 
@@ -738,7 +853,7 @@
     				if (r1.vy > 0) {
     					if (depthX > 0) {
     						if (r1.centerY < r2.centerY && depthY < 0 && (r1.centerY + r1.vy) > (r2.centerY - r2.halfHeight)) {
-    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights - GRAVITY;
+    							r1.vy = r2.centerY - r1.centerY - combinedHalfHeights;
     						}
     					}
     				}
