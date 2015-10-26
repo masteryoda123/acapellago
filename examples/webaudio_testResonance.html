@@ -50,14 +50,14 @@ if (navigator.getUserMedia) {
 //(analyser.fftSize / 8):: about 0 - 2500
 //range (Hz) of the audio
 //NOTE: MAX_FREQ needs to be an int!
-var MAX_FREQ = Math.round(analyser.frequencyBinCount / 22);
+var MAX_FREQ = Math.round(analyser.frequencyBinCount / 8);
 
 //frequency data points
 var dataArray = new Uint8Array(MAX_FREQ);
 
 //number of distinct recognizable regions
 //NUM_REGIONS cannot be greater than MAX_FREQ or no bars will be drawn
-var NUM_REGIONS = 64;
+var NUM_REGIONS = 256;
 if (NUM_REGIONS > MAX_FREQ) {
 	NUM_REGIONS = MAX_FREQ
 }
@@ -123,7 +123,7 @@ function draw() {
 		//NOTE: handles ONLY 2 regions
 		var vocalOverlapIndex = Math.abs((MAX_FREQ / 2) - i);
 //        regionTotal += REGION_SIZE / (vocalOverlapIndex * 10);
-		if (vocalOverlapIndex < 12) {
+		if (vocalOverlapIndex < 0) {
 			regionTotal += dataArray[i] * (vocalOverlapIndex / 12);
 		} else {
 			regionTotal += dataArray[i];
