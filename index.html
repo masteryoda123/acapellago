@@ -474,11 +474,11 @@
                   gameScene.visible = false;
                   winScene.visible = false;  // shoud be false
                   gameOverScene.visible = true;
-                  if (score > 0) {
-                    endMessage.text = "Score: " + score +"\nHighest Score: " + highScore;
-                  }
                   if (score > highScore) {
                     highScore = score;
+                    }
+                  if (score > 0) {
+                    endMessage.text = "Score: " + score +"\nHighest Score: " + highScore;
                   }
                   score = 0;
 
@@ -696,7 +696,7 @@
                       onScreenObj.push(rect[i]);
                     }
                   } else if (rect[i].status == 1) {
-                    if (rect[i].x + rect[i].width <= 0) {
+                    if (rect[i].x + rect[i].width * 2 <= 0) {
                       //TODO: pop rect[i] off onScreenObj
                       index = onScreenObj.indexOf(rect[i]);
                       if (index > -1) {
